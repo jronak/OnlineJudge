@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -30,7 +31,12 @@ func (user *User) Create() (int64, bool) {
 func (user *User) Login() bool {
 	o := orm.NewOrm()
 	o.Using("default")
-	return o.QueryTable("user").Filter("username", user.Username).Filter("password", user.Password).Exist()
+	if err := o.QueryTable("user").Filter("username",
+		user.Username).Filter("password", user.Password).One(user, "uid"); err == nil {
+		fmt.Println(err)
+		return true
+	}
+	return false
 }
 
 func (user *User) UpdateCollege(college string) bool {

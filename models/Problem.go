@@ -34,7 +34,7 @@ func (problem *Problem) DeleteByPid() bool {
 	return false
 }
 
-func (problem *Problem) GetByName() bool {
+func (problem *Problem) GetByStatement() bool {
 	o := orm.NewOrm()
 	o.Using("default")
 	err := o.Read(problem, "statement")
@@ -55,6 +55,14 @@ func (problem *Problem) GetByUid() ([]Problem, int64) {
 	}
 	return nil, count
 
+}
+
+func (problem *Problem) GetTypes() (*orm.ParamsList, int64) {
+	list := new(orm.ParamsList)
+	o := orm.NewOrm()
+	o.Using("default")
+	num, _ := o.Raw("SELECT DISTINCT type from problem").ValuesFlat(list)
+	return list, num
 }
 
 func (problem *Problem) GetByType() ([]Problem, int64) {

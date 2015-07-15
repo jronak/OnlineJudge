@@ -3,7 +3,6 @@ package controllers
 import (
 	"OnlineJudge/models"
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego"
 )
 
@@ -21,9 +20,6 @@ type ExecController struct {
 
 // Input is manully taken from the form as now. Later Input will be accpted as expected
 func (this *ExecController) Post() {
-	ex := this.GetSession("Name")
-	ess := this.GetSession("Password")
-	fmt.Println(ex, ess)
 	c := models.Exec(this.GetString("code"), this.GetString("language"), this.GetString("stdin"))
 	data, _ := json.Marshal(c)
 	this.Data["json"] = string(data)
@@ -32,9 +28,6 @@ func (this *ExecController) Post() {
 
 //Get method to Exec will casue redirection to home page
 func (this *ExecController) Get() {
-	f := this.StartSession()
-	f.Set("Name", "Ronak")
-	f.Set("Password", "ROnak")
 	this.TplNames = "testExec.html"
 }
 
