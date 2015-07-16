@@ -76,3 +76,13 @@ func (problem *Problem) GetByType() ([]Problem, int64) {
 	}
 	return nil, count
 }
+
+func (problem *Problem) GetSampleIOByPid() bool {
+	o := orm.NewOrm()
+	o.Using("default")
+	err := o.QueryTable("problem").Filter("pid", problem.Pid).One(problem, "sample_input", "sample_output")
+	if err == nil {
+		return true
+	}
+	return false
+}

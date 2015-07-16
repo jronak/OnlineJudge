@@ -37,7 +37,7 @@ func UpdateCategories() {
   Response:
   {"Count":3,"Categories":["Data Structure","","Linked List"]}
 */
-func (this *ProblemController) Get() {
+func (this *ProblemController) List() {
 	this.Data["json"] = categories
 	this.ServeJson()
 }
