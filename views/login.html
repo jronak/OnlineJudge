@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Online Judge</title>
+</head>
+<body>
+<form action="/login" method="POST">
+	<p><input type="text" name="username" placeholder="Username"></p>
+	<p><input type="text" name="password" placeholder="Password"></p>
+	<p><input type="hidden" name="key" value={{.key}}></p>
+	<input type="submit" name="submit">
+</form>
+<p>{{.error}} </p>
+</body>
+</html>
