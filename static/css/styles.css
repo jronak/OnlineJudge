@@ -1,102 +1,54 @@
-/*
-  960 Grid System ~ Text CSS.
-  Learn more ~ http://960.gs/
-  Licensed under GPL and MIT.
-*/
-
-/* `Basic HTML
-----------------------------------------------------------------------------------------------------*/
-
-body {
-  font: 13px/1.5 "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
-}
-
-pre,
-code {
-  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
-}
-
-hr {
-  border: 0 solid #ccc;
-  border-top-width: 1px;
-  clear: both;
-  height: 0;
-}
-
-/* `Headings
-----------------------------------------------------------------------------------------------------*/
-
-h1 {
-  font-size: 25px;
-}
-
-h2 {
-  font-size: 23px;
-}
-
-h3 {
-  font-size: 21px;
-}
-
-h4 {
-  font-size: 19px;
-}
-
-h5 {
-  font-size: 17px;
-}
-
-h6 {
-  font-size: 15px;
-}
-
-/* `Spacing
-----------------------------------------------------------------------------------------------------*/
-
-ol {
-  list-style: decimal;
-}
-
-ul {
-  list-style: disc;
-}
-
-li {
-  margin-left: 30px;
-}
-
-p,
-dl,
-hr,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-ol,
-ul,
-pre,
-table,
-address,
-fieldset,
-figure {
-  margin-bottom: 20px;
-}
-
+/* General Styles */
 .center {
   text-align: center;
 }
+a {
+  color: #2F4C84;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+.margin-15 {
+  margin: 15px 0;
+}
 
+/* All-through pages styles */
+#logo a {
+  color: #000;
+  text-decoration: none;
+}
+#header h1 {
+  margin: 10px 0;
+}
+.login-button {
+  padding: 18px 0;
+  font-size: 14px;
+  text-align: center;
+  background-color: #F2F2F2;
+}
+.login-button:hover {
+  background-color: #F8F8F8;
+}
+#content, #sidebar {
+  margin: 10px 0 20px 0;
+  border: solid 1px #F0F0F0;
+  padding: 0 10px;
+}
 
 /* List Page */
 .problems-list {
-  padding: 10px 0;
+  margin: 15px 0;
+  background-color: #F9F9F9;
 }
 
 .problem {
-  margin: 10px;
   padding: 5px;
+  border-bottom: solid 1px #DDD;
+}
+.problem:hover {
+  border: solid 1px #DDD;
+  padding-left: 4px;
 }
 
 .problem span {
