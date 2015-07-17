@@ -34,7 +34,7 @@ func (this *ExecController) Get() {
 
 //Execpts only Post requests!
 func (this *ExecController) Submit() {
-	c := models.ExecBatch(6, this.GetString("code"), this.GetString("language"))
+	c := models.SubmitUpdateScore(2, 10, this.GetString("code"), this.GetString("language"))
 	data, _ := json.Marshal(&c)
 	this.Data["json"] = string(data)
 	this.ServeJson()

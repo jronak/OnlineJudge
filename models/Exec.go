@@ -4,7 +4,7 @@ import (
 	"OnlineJudge/Judge"
 )
 
-// Just run code used here. if stdin is nil, then sample input as used
+// Just run code used here. if stdin is nil, then sample input is used
 func Exec(pid int, rawCode string, lang string, stdin string) Judge.Code {
 	code := Judge.Code{Lang: lang, Stdin: stdin}
 	cr := Judge.CRManager{Program: &code, RawCode: &rawCode}

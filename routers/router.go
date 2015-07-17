@@ -7,7 +7,7 @@ import (
 
 func init() {
 	//Exec is running at the root
-	beego.Router("/", &controllers.ProblemController{}, "*:List")
+	beego.Router("/", &controllers.ExecController{}, "get:Get;*:Submit")
 	beego.AutoRouter(&controllers.UserController{})
 	//beego.Router("/problem/create", &controllers.ProblemController{}, "*:Create;post:SaveProblem")
 	beego.Router("/problem/:type", &controllers.ProblemController{}, "*:ProblemsByCategory")

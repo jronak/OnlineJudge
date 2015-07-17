@@ -224,10 +224,12 @@ func (cr *CRManager) RunBatchManager() {
 				status.Comment = "Correct"
 				cr.Status <- status
 			} else {
+				status.Success = false
 				status.Comment = "Wrong Answer"
 				cr.Status <- status
 			}
 		} else {
+			status.Success = false
 			status.Comment = code.Stderr
 			<-cr.Stdout
 			cr.Status <- status

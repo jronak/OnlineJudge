@@ -38,7 +38,10 @@ func UpdateCategories() {
   {"Count":3,"Categories":["Data Structure","","Linked List"]}
 */
 func (this *ProblemController) List() {
-	this.Data["json"] = categories
+	problem := models.Problem{}
+	problems, _ := problem.GetRecent()
+	bytes, _ := json.Marshal(problems)
+	this.Data["json"] = string(bytes)
 	this.ServeJson()
 }
 
