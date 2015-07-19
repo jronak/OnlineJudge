@@ -1,0 +1,67 @@
+/* General Styles */
+.center {
+  text-align: center;
+}
+a {
+  color: #2F4C84;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+.margin-15 {
+  margin: 15px 0;
+}
+
+/* All-through pages styles */
+#logo a {
+  color: #000;
+  text-decoration: none;
+}
+#header h1 {
+  margin: 10px 0;
+}
+.login-button {
+  padding: 18px 0;
+  font-size: 14px;
+  text-align: center;
+  background-color: #F2F2F2;
+}
+.login-button:hover {
+  background-color: #F8F8F8;
+}
+#content, #sidebar {
+  margin: 10px 0 20px 0;
+  border: solid 1px #F0F0F0;
+  padding: 0 10px;
+}
+
+/* List Page */
+.problems-list {
+  margin: 15px 0;
+  background-color: #F9F9F9;
+}
+
+.problem {
+  padding: 5px;
+  border-bottom: solid 1px #DDD;
+}
+.problem:hover {
+  border: solid 1px #DDD;
+  padding-left: 4px;
+}
+
+.problem span {
+  margin-right: 20px;
+}
+
+
+/* Problem Page */
+.problem-details {
+  margin: 15px;
+}
+
+.write-code {
+  margin-top: 50px;
+  margin-left: 20px;
+}

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -11,6 +12,7 @@ func (problem *Problem) Create() (int64, bool) {
 	if err == nil {
 		return id, true
 	}
+	beego.Error(err)
 	return 0, false
 }
 
@@ -22,6 +24,17 @@ func (problem *Problem) GetByPid() bool {
 		return true
 	}
 	return false
+}
+
+func (problem *Problem) GetRecent() ([]Problem, int64) {
+	var problems []Problem
+	o := orm.NewOrm()
+	o.Using("default")	
+	count, err := o.QueryTable("problem").OrderBy("Created_at").Limit(10).All(&problems)
+	if err == nil {
+		return problems, count
+	}
+	return nil, count
 }
 
 func (problem *Problem) DeleteByPid() bool {
@@ -37,7 +50,17 @@ func (problem *Problem) DeleteByPid() bool {
 func (problem *Problem) GetByStatement() bool {
 	o := orm.NewOrm()
 	o.Using("default")
-	err := o.Read(problem, "statement")
+	err := o.Read(problem)
+	if err == nil {
+		return true
+	}
+	return false
+}
+
+func (problem *Problem) GetById() bool {
+	o := orm.NewOrm()
+	o.Using("default")
+	err := o.Read(problem)
 	if err == nil {
 		return true
 	}
@@ -54,7 +77,6 @@ func (problem *Problem) GetByUid() ([]Problem, int64) {
 		return problems, count
 	}
 	return nil, count
-
 }
 
 func (problem *Problem) GetTypes() (*orm.ParamsList, int64) {

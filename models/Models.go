@@ -30,7 +30,7 @@ type Problem struct {
 	Solution_code        string `json:"-"`
 	Type                 string
 	Difficulty           string
-	Created_at           time.Time
+	Created_at           time.Time `orm:"auto_now_add;type(datetime)"`
 	Points               int
 	Solve_count          int
 }
@@ -50,7 +50,7 @@ type Problemlogs struct {
 	Uid    int
 	Solved int
 	Points int
-	Time   time.Time
+	Time   time.Time `orm:"auto_now_add;type(datetime)"`
 }
 
 func init() {
