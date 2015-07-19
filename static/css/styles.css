@@ -12,6 +12,10 @@ a:hover {
 .margin-15 {
   margin: 15px 0;
 }
+.left {
+  display: block;
+  float: left;
+}
 
 /* All-through pages styles */
 #logo a {
