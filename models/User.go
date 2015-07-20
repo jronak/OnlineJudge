@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -31,9 +31,8 @@ func (user *User) Create() (int64, bool) {
 func (user *User) Login() bool {
 	o := orm.NewOrm()
 	o.Using("default")
-	if err := o.QueryTable("user").Filter("username",
-		user.Username).Filter("password", user.Password).One(user, "uid"); err == nil {
-		fmt.Println(err)
+	err := o.QueryTable("user").Filter("username", user.Username).Filter("password", user.Password).One(user, "uid")
+	if err == nil {
 		return true
 	}
 	return false
@@ -134,6 +133,15 @@ func (user *User) UpdateRank(rank int) bool {
 		if _, err := o.Update(user); err == nil {
 			return true
 		}
+	}
+	return false
+}
+
+func (user *User) Get() bool {
+	o := orm.NewOrm()
+	o.Using("default")
+	if err := o.Read(user); err == nil {
+		return true
 	}
 	return false
 }

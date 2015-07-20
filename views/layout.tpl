@@ -16,7 +16,11 @@
 			</div>
 			<div class="grid_5 prefix_14 omega">
 				<div class="login-button">
-					<a href="/login">Sign-up / Log-in</a>
+					{{ if .logged }}
+						<a href="/user/{{ .login }}">{{ .login }}</a> <a href="/user/logout">(logout)</a>
+					{{ else }}
+						<a href="/user/login">Login or Sign up</a>
+					{{ end }}
 				</div>
 			</div>
 		</div>

@@ -3,7 +3,6 @@ package controllers
 import (
 	"OnlineJudge/models"
 	"encoding/json"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"strconv"
 )
@@ -21,7 +20,7 @@ type ProblemTypes struct {
 }
 
 type ProblemController struct {
-	beego.Controller
+	BaseController
 }
 
 //Caching the categories
@@ -31,6 +30,11 @@ func UpdateCategories() {
 	pt := ProblemTypes{Count: num, Categories: list}
 	bytes, _ := json.Marshal(&pt)
 	categories = string(bytes)
+}
+
+func (this *ProblemController) Get() {
+	this.Data["json"] = categories
+	this.ServeJson()
 }
 
 // Json served
