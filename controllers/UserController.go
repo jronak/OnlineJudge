@@ -2,54 +2,66 @@ package controllers
 
 import (
 	"OnlineJudge/models"
-	"fmt"
-	"github.com/astaxie/beego"
 )
 
 type UserController struct {
-	beego.Controller
+	BaseController
 }
 
-/*
-	if session is registeried, redirected to root(/)
-	else login page displayed
-	Key = unique for keeping away machine; if aint worth, ditch
-	error = Using error to display on test login
-*/
-func (this *UserController) Get() {
-	sess := this.StartSession()
-	uid := sess.Get("Uid")
-	fmt.Println(uid)
+func (this *UserController) Login() {
+	uid := this.GetSession("Uid")
 	if uid != nil {
 		this.Redirect("/", 302)
 	}
-	this.Data["error"] = ""
-	this.Data["key"] = ""
-	this.TplNames = "login.html"
+
+	if this.Ctx.Input.Param("0") == "submit" {
+		user := models.User{
+			Username: this.GetString("username"),
+			Password: this.GetString("password"),
+		}
+		if user.Login() == true {
+			this.SetSession("Uid", this.GetString("username"))
+			this.Redirect("/", 302)
+		}
+	}
+
+	this.Data["title"] = "Login"
+
+	this.Layout = "layout.tpl"
+	this.TplNames = "user/login.tpl"
+	this.LayoutSections = make(map[string]string)
+    this.LayoutSections["HtmlHead"] = ""
+    this.LayoutSections["Sidebar"] = ""
 }
 
-//Username and login to be received via header
-func (this *UserController) Post() {
-	username := this.GetString("username")
-	password := this.GetString("password")
-	ubool := models.CheckUserName(username)
-	pbool := models.CheckPassword(password)
-	if ubool && pbool {
-		user := &models.User{Username: username, Password: password}
-		if user.Login() {
-			fmt.Println(user.Uid)
-			ses := this.StartSession()
-			ses.Set("Uid", user.Uid)
-			ses.Set("Username", username)
-		} else {
-			this.Data["error"] = "Username or password is incorrect"
-			this.TplNames = "login.html"
-			return
-		}
-	} else {
-		this.Data["error"] = "Username or password is invalid"
-		this.TplNames = "login.html"
-		return
-	}
+func (this *UserController) Logout() {
+	this.DelSession("Uid")
 	this.Redirect("/", 302)
+}
+
+func (this *UserController) Signup() {
+	uid := this.GetSession("Uid")
+	if uid != nil {
+		this.Redirect("/", 302)
+	}
+
+	if this.Ctx.Input.Param("0") != "submit" {
+		this.Redirect("/user/login", 302)
+	}
+
+	user := models.User{
+		Username: this.GetString("username"),
+		Password: this.GetString("passkey"),
+		Name: this.GetString("name"),
+		College: this.GetString("college"),
+		Email: this.GetString("email"),
+	}
+
+	uid, done := user.Create()
+
+	if done {
+		this.SetSession("Uid", this.GetString("username"))
+		this.Redirect("/", 302)
+	}
+	this.Redirect("/user/login", 302)
 }

@@ -30,7 +30,7 @@ func (problem *Problem) GetRecent() ([]Problem, int64) {
 	var problems []Problem
 	o := orm.NewOrm()
 	o.Using("default")	
-	count, err := o.QueryTable("problem").OrderBy("Created_at").Limit(10).All(&problems)
+	count, err := o.QueryTable("problem").OrderBy("-Created_at").Limit(10).All(&problems)
 	if err == nil {
 		return problems, count
 	}
