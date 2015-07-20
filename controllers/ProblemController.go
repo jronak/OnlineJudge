@@ -33,19 +33,6 @@ func UpdateCategories() {
 	categories = string(bytes)
 }
 
-/*
-  router : /problem/
-  Response:
-  {"Count":3,"Categories":["Data Structure","","Linked List"]}
-*/
-func (this *ProblemController) List() {
-	problem := models.Problem{}
-	problems, _ := problem.GetRecent()
-	bytes, _ := json.Marshal(problems)
-	this.Data["json"] = string(bytes)
-	this.ServeJson()
-}
-
 // Json served
 // To do : serve in pages, per page 10 problems
 func (this *ProblemController) ProblemsByCategory() {
@@ -74,20 +61,20 @@ func (this *ProblemController) Create() {
 func (this *ProblemController) SaveProblem() {
 	points, _ := strconv.Atoi(this.GetString("points"))
 	problem := models.Problem{
-		Statement: this.GetString("statement"),
-		Description: this.GetString("description"),
-		Constraints: this.GetString("constraints"),
-		Sample_input: this.GetString("sample_input"),
+		Statement:     this.GetString("statement"),
+		Description:   this.GetString("description"),
+		Constraints:   this.GetString("constraints"),
+		Sample_input:  this.GetString("sample_input"),
 		Sample_output: this.GetString("sample_output"),
-		Type: this.GetString("type"),
-		Difficulty: this.GetString("difficulty"),
-		Points: points,
-		Uid: 1,
+		Type:          this.GetString("type"),
+		Difficulty:    this.GetString("difficulty"),
+		Points:        points,
+		Uid:           1,
 	}
 	id, noerr := problem.Create()
 	if noerr == true {
 		pid := strconv.FormatInt(id, 10)
-		this.Redirect("/problem/" + pid, 301)
+		this.Redirect("/problem/"+pid, 301)
 	}
 
 	this.Data["title"] = "Create Problem "
@@ -109,8 +96,8 @@ func (this *ProblemController) List() {
 	this.Layout = "layout.tpl"
 	this.TplNames = "problem/list.tpl"
 	this.LayoutSections = make(map[string]string)
-    this.LayoutSections["HtmlHead"] = ""
-    this.LayoutSections["Sidebar"] = "sidebar/showcategories.tpl"
+	this.LayoutSections["HtmlHead"] = ""
+	this.LayoutSections["Sidebar"] = "sidebar/showcategories.tpl"
 }
 
 // Serves the Problem Page
@@ -119,9 +106,9 @@ func (this *ProblemController) ProblemById() {
 	pid := this.Ctx.Input.Param(":id")
 	id, err := strconv.Atoi(pid)
 	if err != nil {
-        // Redirect to 404
-        this.Abort("404")
-    }
+		// Redirect to 404
+		this.Abort("404")
+	}
 	p := models.Problem{Pid: id}
 	p.GetById()
 	this.Data["title"] = p.Statement
@@ -130,6 +117,6 @@ func (this *ProblemController) ProblemById() {
 	this.Layout = "layout.tpl"
 	this.TplNames = "problem/show.tpl"
 	this.LayoutSections = make(map[string]string)
-    this.LayoutSections["HtmlHead"] = ""
-    this.LayoutSections["Sidebar"] = "sidebar/showsimilar.tpl"
+	this.LayoutSections["HtmlHead"] = ""
+	this.LayoutSections["Sidebar"] = "sidebar/showsimilar.tpl"
 }
