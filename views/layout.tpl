@@ -5,7 +5,8 @@
 	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/960.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/styles.css">
-	{{.HtmlHead}}
+	<script type="text/javascript" src="/static/js/jquery-2.1.4.min.js"></script>
+	{{ .HtmlHead }}
 </head>
 
 <body>

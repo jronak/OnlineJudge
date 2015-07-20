@@ -16,6 +16,10 @@ a:hover {
   display: block;
   float: left;
 }
+.right {
+  display: inline-block;
+  float: right;
+}
 
 /* All-through pages styles */
 #logo a {
@@ -37,7 +41,7 @@ a:hover {
 #content, #sidebar {
   margin: 10px 0 20px 0;
   border: solid 1px #F0F0F0;
-  padding: 0 10px;
+  padding: 5px 10px;
 }
 
 /* List Page */
