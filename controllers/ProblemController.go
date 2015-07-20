@@ -127,6 +127,6 @@ func (this *ProblemController) ProblemById() {
 	this.Layout = "layout.tpl"
 	this.TplNames = "problem/show.tpl"
 	this.LayoutSections = make(map[string]string)
-    this.LayoutSections["HtmlHead"] = ""
+    this.LayoutSections["HtmlHead"] = "problem/submit_head.tpl"
     this.LayoutSections["Sidebar"] = "sidebar/showsimilar.tpl"
 }
