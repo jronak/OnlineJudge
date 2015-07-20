@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"OnlineJudge/models"
+	//"github.com/astaxie/beego"
 )
 
 type UserController struct {
@@ -19,10 +20,19 @@ func (this *UserController) Login() {
 			Username: this.GetString("username"),
 			Password: this.GetString("password"),
 		}
+		// Handle the flash messages
+		/*		err := user.LoginVerify()
+				if err != nil {
+					flash := beego.NewFlash()
+					flash.Error(err.Error())
+				}*/
 		if user.Login() == true {
 			this.SetSession("Uid", this.GetString("username"))
+			this.SetSession("id", user.Uid)
+			// store the user ID in the session
 			this.Redirect("/", 302)
 		}
+		//If login failed, flash a relevent message
 	}
 
 	this.Data["title"] = "Login"
@@ -30,12 +40,13 @@ func (this *UserController) Login() {
 	this.Layout = "layout.tpl"
 	this.TplNames = "user/login.tpl"
 	this.LayoutSections = make(map[string]string)
-    this.LayoutSections["HtmlHead"] = ""
-    this.LayoutSections["Sidebar"] = ""
+	this.LayoutSections["HtmlHead"] = ""
+	this.LayoutSections["Sidebar"] = ""
 }
 
 func (this *UserController) Logout() {
 	this.DelSession("Uid")
+	this.DelSession("id")
 	this.Redirect("/", 302)
 }
 
@@ -52,15 +63,21 @@ func (this *UserController) Signup() {
 	user := models.User{
 		Username: this.GetString("username"),
 		Password: this.GetString("passkey"),
-		Name: this.GetString("name"),
-		College: this.GetString("college"),
-		Email: this.GetString("email"),
+		Name:     this.GetString("name"),
+		College:  this.GetString("college"),
+		Email:    this.GetString("email"),
 	}
-
+	/*All the fields verified, as well checked if username and email are unique
+	err := user.SignupVerify()
+	if err!= nil{
+		flash := beego.NewFlash()
+		flash.Error(err.Error())*
+	}*/
 	uid, done := user.Create()
 
 	if done {
 		this.SetSession("Uid", this.GetString("username"))
+		this.SetSession("id", uid)
 		this.Redirect("/", 302)
 	}
 	this.Redirect("/user/login", 302)

@@ -32,9 +32,12 @@ func SubmitUpdateScore(uid int, pid int, rawcode string, lang string) SubmitResp
 		problemlog.Points = score
 		problemlog.Time = time.Now()
 		problemlog.CommitByPidUid()
+		problem.Solve_count++
+		problem.Update()
 	} else {
 		if problemlog.Points < score {
 			problemlog.Points = score
+			problemlog.Solved++
 			problemlog.Update()
 		}
 	}

@@ -6,7 +6,7 @@ USE OnlineJudge;
 CREATE TABLE IF NOT EXISTS `user` (
 	`uid` int AUTO_INCREMENT PRIMARY KEY,
 	`username` varchar(15) NOT NULL UNIQUE,
-	`password` varchar(15) NOT NULL,
+	`password` varchar(100) NOT NULL,
 	`name` varchar(20) NOT NULL,
 	`college` varchar(30) DEFAULT "",
 	`email` varchar(30) NOT NULL UNIQUE,

@@ -12,8 +12,10 @@
 		<textarea id="paste_code" name="code" placeholder="// Place Code here"></textarea><br/>
 		<select name="language">
 			<option value="C">C</option>
-			<option value="Cpp">C++</option>
+			<option value="C++">C++</option>
 			<option value="Java">Java</option>
+			<option value="Python2">Python2</option>
+			<option value="Pytho3">Python3</option>
 			<option value="Go">Go</option>
 		</select>
 		<div class="right"><input type="button" name="save" value="Save Draft"/><input type="button" name="run" value="Run"/><input type="submit"/></div>

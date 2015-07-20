@@ -7,10 +7,16 @@ import (
 
 var (
 	usernameMatcher *regexp.Regexp
+	emailMatcher    *regexp.Regexp
+	nameMatcher     *regexp.Regexp
+	collegeMatcher  *regexp.Regexp
 )
 
 func init() {
-	usernameMatcher, _ = regexp.Compile("^[\\w\\d_]*$")
+	usernameMatcher = regexp.MustCompile("^[\\w\\d_\\.]*$")
+	emailMatcher = regexp.MustCompile("^[\\w\\d_\\.]{2,}\\@[\\w\\d]*\\.[\\w]{2,4}(\\.[\\w]{2,4})?$")
+	nameMatcher = regexp.MustCompile("^([\\w]{1,}\\s?){1,}$")
+	collegeMatcher = regexp.MustCompile("^([\\w-]{1,}\\s?){1,}$")
 }
 
 func CheckUserName(username string) bool {
@@ -20,11 +26,23 @@ func CheckUserName(username string) bool {
 	return usernameMatcher.Match([]byte(username))
 }
 
+func CheckEmail(email string) bool {
+	return emailMatcher.Match([]byte(email))
+}
+
 func CheckPassword(password string) bool {
 	if len(password) < 8 {
 		return false
 	}
 	return matchPassword(password)
+}
+
+func CheckName(name string) bool {
+	return nameMatcher.Match([]byte(name))
+}
+
+func CheckCollege(college string) bool {
+	return collegeMatcher.Match([]byte(college))
 }
 
 func matchPassword(password string) bool {

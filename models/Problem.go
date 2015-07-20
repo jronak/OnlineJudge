@@ -16,6 +16,16 @@ func (problem *Problem) Create() (int64, bool) {
 	return 0, false
 }
 
+func (problem *Problem) Update() bool {
+	o := orm.NewOrm()
+	o.Using("default")
+	_, b := o.Update(problem)
+	if b == nil {
+		return true
+	}
+	return false
+}
+
 func (problem *Problem) GetByPid() bool {
 	o := orm.NewOrm()
 	o.Using("default")
@@ -87,11 +97,11 @@ func (problem *Problem) GetTypes() (*orm.ParamsList, int64) {
 	return list, num
 }
 
-func (problem *Problem) GetByType() ([]Problem, int64) {
+func (problem *Problem) GetByType(page int) ([]Problem, int64) {
 	var problems []Problem
 	o := orm.NewOrm()
 	o.Using("default")
-	count, err := o.QueryTable("problem").Filter("type", problem.Type).All(&problems, "pid", "statement", "type",
+	count, err := o.QueryTable("problem").Filter("type", problem.Type).Offset((page-1)*10).Limit(10).All(&problems, "pid", "statement", "type",
 		"difficulty", "points", "solve_count")
 	if err == nil {
 		return problems, count
