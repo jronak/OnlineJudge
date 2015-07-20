@@ -9,13 +9,14 @@
 <div class="write-code">
 	<h5>Submit your code</h5>
 	<form action="/problem/{{.problem.Pid}}/submit" method="POST">
-		<textarea id="paste_code" name="code" placeholder="// Place Code here"></textarea><br/>
+		<textarea id="paste_code" name="code" placeholder="// Write Your Code Here"></textarea><br/>
 		<select name="language">
 			<option value="C">C</option>
 			<option value="Cpp">C++</option>
 			<option value="Java">Java</option>
 			<option value="Go">Go</option>
 		</select>
-		<div class="right"><input type="button" name="save" value="Save Draft"/><input type="button" name="run" value="Run"/><input type="submit"/></div>
+		<div class="right"><input type="button" name="save" value="Save Draft"/><input type="button" name="save" value="Clear Draft"/>&nbsp;&nbsp;&nbsp;<input type="button" name="run" value="Run"/><input type="submit"/></div>
 	</form>
 </div>
+<!-- Tell Users that the draft is placed on their computer -->
