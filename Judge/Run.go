@@ -14,10 +14,17 @@ type RunResponse struct {
 	runResponse chan int
 }
 
+type TestCaseStatus struct {
+	Success  bool
+	Comment  string
+	ExecTime float64
+}
+
 const (
-	defaultExecTimeout = 2
-	runWorkPoolSize    = 10
-	runChannelSize     = 2 * runWorkPoolSize
+	defaultExecTimeout       time.Duration = time.Second * 2
+	defaultExecTimeoutScript time.Duration = time.Second * 5
+	runWorkPoolSize                        = 5
+	runChannelSize                         = 2 * runWorkPoolSize
 )
 
 var (
@@ -75,10 +82,8 @@ func cpp_run(code *Code) *exec.Cmd {
 
 //Go exec command : format "go run PATH+FILENAME+.py"
 func go_run(code *Code) *exec.Cmd {
-	executor := "go"
-	option := "run"
-	toRun := code.path + code.name + ".go"
-	return exec.Command(executor, option, toRun)
+	toRun := code.path + code.name
+	return exec.Command(toRun)
 }
 
 //Error checker
@@ -98,12 +103,6 @@ Status Codes:
 func run(channel chan RunResponse) {
 	for work := range channel {
 		code := work.code
-		var timeout time.Duration
-		if code.execTimeLimit == 0 {
-			timeout = defaultExecTimeout
-		} else {
-			timeout = code.execTimeLimit
-		}
 		cmd := RunCommandMap[code.Lang](code)
 		stdinPipe, _ := cmd.StdinPipe()
 		stdoutPipe, _ := cmd.StdoutPipe()
@@ -136,7 +135,7 @@ func run(channel chan RunResponse) {
 				code.Stdout = string(outByte)
 				code.RunStatus = true
 			}
-		case <-time.After(time.Second * timeout):
+		case <-time.After(code.execTimeLimit):
 			cmd.Process.Kill()
 			log.Println("Run Timeout Lang: ", code.Lang)
 			code.Stderr = "Execution Timeout"
@@ -203,9 +202,37 @@ func run(statusChannel chan int, code *Code) {
 
 func (code *Code) RunManager() {
 	res := RunResponse{code: code, runResponse: make(chan int)}
-	channel := runChannelMap[code.Lang]
-	channel <- res
+	langChannel := runChannelMap[code.Lang]
+	langChannel <- res
 	<-res.runResponse
+}
+
+func (cr *CRManager) RunBatchManager() {
+	code := cr.Program
+	res := RunResponse{code: code, runResponse: make(chan int)}
+	langChannel := runChannelMap[code.Lang]
+	code.execTimeLimit = defaultExecTimeout
+	status := TestCaseStatus{}
+	for stdin := range cr.Stdin {
+		code.Stdin = stdin
+		langChannel <- res
+		<-res.runResponse
+		status.ExecTime = code.ExecTime
+		if code.RunStatus == true {
+			if code.Stdout == <-cr.Stdout {
+				status.Success = true
+				status.Comment = "Correct"
+				cr.Status <- status
+			} else {
+				status.Comment = "Wrong Answer"
+				cr.Status <- status
+			}
+		} else {
+			status.Comment = code.Stderr
+			<-cr.Stdout
+			cr.Status <- status
+		}
+	}
 }
 
 /*

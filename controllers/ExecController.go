@@ -18,10 +18,11 @@ type ExecController struct {
 		"CompilationStatus":false,"RunStatus":false,"ExecTime":0}
 */
 
-// Input is manully taken from the form as now. Later Input will be accpted as expected
+// Input is manully taken from the form as now.
+//Later Input will be accpted as expected. 6 is pid for the sake of testing
 func (this *ExecController) Post() {
-	c := models.Exec(this.GetString("code"), this.GetString("language"), this.GetString("stdin"))
-	data, _ := json.Marshal(c)
+	c := models.Exec(6, this.GetString("code"), this.GetString("language"), this.GetString("stdin"))
+	data, _ := json.Marshal(&c)
 	this.Data["json"] = string(data)
 	this.ServeJson()
 }
@@ -33,6 +34,8 @@ func (this *ExecController) Get() {
 
 //Execpts only Post requests!
 func (this *ExecController) Submit() {
-	this.Data["json"] = `{Test : "Send submit request here"}`
+	c := models.ExecBatch(6, this.GetString("code"), this.GetString("language"))
+	data, _ := json.Marshal(&c)
+	this.Data["json"] = string(data)
 	this.ServeJson()
 }

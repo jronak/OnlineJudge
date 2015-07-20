@@ -17,44 +17,37 @@ const (
 	nameBufferSize      = 1000
 	dirSuffixLen        = 2
 	fileNameLen         = 6
-	crOnceWorkSize      = 20
+	crOnceWorkSize      = 2
 	crOnceChanBufSize   = 2 * crOnceWorkSize
+	deleteBufferSize    = 2 * crOnceChanBufSize
 )
 
 type CRManager struct {
-	Program       *Code
-	RawCode       *string
-	Pid           int
-	IsCustomInput bool
-	IsBatch       bool
-	batchSize     int
-	stdin         chan string
-	stdout        chan string
-	status        chan bool
-	receive       chan int
+	Program *Code
+	RawCode *string
+	Stdin   chan string
+	Stdout  chan string
+	Status  chan TestCaseStatus
+	Receive chan int
 }
 
-var crChannelOnce chan *CRManager
-
-//All the Languages supported listed here
-var supportedLangs []string
-
 /*
-	Buffered Channel holds the path names for Java programs : Buffer Size :10
-	Java Code should contain Main.class.
-	Main.class can be disturbed by other routines
-	Hence separate DIR for every java programa
+	crChannelOnce : Buffered channel for single run requests
+	supportedLangs : All the Languages supported listed here
+	javaPathChan : Buffered Channel holds the path names for Java programs
+	fileNameChan : Buffered Channel holds the file names
+	codeExtensionMap :Code Extensions : {".c",".java",...}
 */
-var javaPathChan chan string
-
-/*
-	Buffered Channel holds the file names : Buffer Size : 1000
-	Maintains unique filenames
-*/
-var fileNameChan chan string
-
-//	Code Extensions : {".c",".java",...}
-var codeExtensionsMap map[string]string
+var (
+	crChannelOnce     chan *CRManager
+	crChannelBatch    chan *CRManager
+	supportedLangs    []string
+	javaPathChan      chan string
+	fileNameChan      chan string
+	codeExtensionsMap map[string]string
+	fileDeleteChan    chan []string
+	dirDeleteChan     chan string
+)
 
 //Bool: if the program is compilable true
 func (cr *CRManager) isCompilableLang() bool {
@@ -63,28 +56,10 @@ func (cr *CRManager) isCompilableLang() bool {
 }
 
 //Dumps the program into a file
-func (cr *CRManager) createCode() {
+func (cr *CRManager) createFile() {
 	path := cr.Program.path + cr.Program.name + codeExtensionsMap[cr.Program.Lang]
 	err := ioutil.WriteFile(path, []byte(*cr.RawCode), fileDirPermissions)
 	CheckError(err)
-}
-
-//Deletes program file
-func (cr *CRManager) deleteCode() {
-	if cr.isCompilableLang() {
-		os.Remove(cr.Program.path + cr.Program.name + codeExtensionsMap[cr.Program.Lang])
-	}
-}
-
-//Deletes the Executables
-func (cr *CRManager) deleteExec() {
-	if cr.Program.Lang == "Java" {
-		os.RemoveAll(cr.Program.path)
-	} else if cr.isCompilableLang() {
-		os.Remove(cr.Program.path + cr.Program.name)
-	} else {
-		os.Remove(cr.Program.path + cr.Program.name + codeExtensionsMap[cr.Program.Lang])
-	}
 }
 
 //Sets the path for Program
@@ -96,20 +71,17 @@ func (cr *CRManager) setPath() {
 	}
 }
 
-//Adds the file name back to the buffer
-func (cr *CRManager) resetName() {
-	fileNameChan <- cr.Program.name
-}
-
 //Sets the name
 func (cr *CRManager) setName() {
 	cr.Program.name = <-fileNameChan
 }
 
-//Adds the path back to the buffer
-func (cr *CRManager) resetPath() {
-	if cr.Program.Lang == "Java" {
-		generatePaths(1)
+func (cr *CRManager) garbageCollector() {
+	if cr.Program.Lang == "java" {
+		dirDeleteChan <- cr.Program.path
+	} else {
+		names := []string{cr.Program.path, cr.Program.name, codeExtensionsMap[cr.Program.Lang]}
+		fileDeleteChan <- names
 	}
 }
 
@@ -121,36 +93,73 @@ func (cr *CRManager) resetPath() {
 			Deletes Code file
 			Deletes Executables(if not batch run)
 */
+
+// Worker for Compile once
 func crOnceWorker(channel chan *CRManager) {
 	for cr := range channel {
 		run := true
 		cr.setName()
 		cr.setPath()
-		cr.createCode()
+		cr.createFile()
 		if cr.isCompilableLang() {
 			cr.Program.CompilationManager()
 			if cr.Program.CompilationStatus == false {
-				cr.receive <- 1
+				cr.Receive <- 1
 				run = false
 			}
 		}
 		if run {
 			cr.Program.RunManager()
-			cr.receive <- 1
+			cr.Receive <- 1
 		}
-		func() {
-			cr.deleteCode()
-			cr.deleteExec()
-			cr.resetPath()
-			cr.resetName()
-		}()
+		cr.garbageCollector()
 	}
 }
 
+// Compiler and run once
 func (cr *CRManager) CROnce() {
-	cr.receive = make(chan int)
+	cr.Receive = make(chan int)
+	if cr.Program.execTimeLimit == 0 {
+		if cr.isCompilableLang() {
+			cr.Program.execTimeLimit = defaultExecTimeout
+		} else {
+			cr.Program.execTimeLimit = defaultExecTimeoutScript
+		}
+	}
 	crChannelOnce <- cr
-	<-cr.receive
+	<-cr.Receive
+}
+
+func crBatchWorker(channel chan *CRManager) {
+	for cr := range channel {
+		run := true
+		cr.setName()
+		cr.setPath()
+		cr.createFile()
+		if cr.isCompilableLang() {
+			cr.Program.CompilationManager()
+			if cr.Program.CompilationStatus == false {
+				cr.Receive <- 1
+				run = false
+			} else {
+				cr.Receive <- 0
+			}
+		} else {
+			cr.Receive <- 0
+		}
+		if run {
+			cr.RunBatchManager()
+		}
+		cr.garbageCollector()
+	}
+}
+
+func (cr *CRManager) CRBatch() {
+	cr.Receive = make(chan int, 1)
+	cr.Status = make(chan TestCaseStatus, 1)
+	cr.Stdin = make(chan string, 1)
+	cr.Stdout = make(chan string, 1)
+	crChannelBatch <- cr
 }
 
 //Generates random strings
@@ -180,6 +189,23 @@ func generatePaths(n int) {
 	}
 }
 
+// Deletes the program files as well buffers the name channel
+func fileDeleteWorker(channel chan []string) {
+	for file := range channel {
+		os.Remove(file[0] + file[1])
+		os.Remove(file[0] + file[1] + file[2])
+		fileNameChan <- file[1]
+	}
+}
+
+// Deletes the java program dir and generates new path
+func dirDeleteWorker(channel chan string) {
+	for dir := range channel {
+		os.RemoveAll(dir)
+		generatePaths(1)
+	}
+}
+
 //** To be defered in the Main
 func removeTempPath() {
 	os.RemoveAll(rootPath)
@@ -188,7 +214,10 @@ func removeTempPath() {
 func init() {
 	javaPathChan = make(chan string, javaPathsBufferSize)
 	fileNameChan = make(chan string, nameBufferSize)
+	dirDeleteChan = make(chan string, deleteBufferSize)
+	fileDeleteChan = make(chan []string, deleteBufferSize)
 	crChannelOnce = make(chan *CRManager, crOnceChanBufSize)
+	crChannelBatch = make(chan *CRManager, crOnceChanBufSize)
 	os.MkdirAll(defaultPath, fileDirPermissions)
 	generatePaths(javaPathsBufferSize)
 	generateNames(nameBufferSize)
@@ -200,6 +229,9 @@ func init() {
 	}
 	for iter := 0; iter < crOnceWorkSize; iter++ {
 		go crOnceWorker(crChannelOnce)
+		go crBatchWorker(crChannelBatch)
 	}
-	log.Println("CRManager Init : Normal")
+	go dirDeleteWorker(dirDeleteChan)
+	go fileDeleteWorker(fileDeleteChan)
+	go log.Println("CRManager Init : Normal")
 }
