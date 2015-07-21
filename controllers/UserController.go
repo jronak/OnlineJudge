@@ -83,3 +83,23 @@ func (this *UserController) Signup() {
 	}
 	this.Redirect("/user/login", 302)
 }
+
+// To-do: Show programs solved by the user
+func (this *UserController) Show() {
+	if this.Ctx.Input.Param("0") == "" {
+		this.Abort("404")
+	}
+	user := models.User{ Username: this.Ctx.Input.Param("0") }
+	if user.GetByUsername() {
+		this.Data["title"] = user.Username
+		this.Data["userDetails"] = user
+
+		this.Layout = "layout.tpl"
+		this.TplNames = "user/show.tpl"
+		this.LayoutSections = make(map[string]string)
+		this.LayoutSections["HtmlHead"] = ""
+		this.LayoutSections["Sidebar"] = ""
+	} else {
+		this.Abort("404")
+	}
+}

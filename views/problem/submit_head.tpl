@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="/static/CodeMirror/lib/codemirror.css">
 <link rel="stylesheet" href="/static/CodeMirror/theme/ambiance.css">
 <script type="text/javascript">
+	var output;
 	$(document).ready(function () {
 		config = {
 			lineNumbers: true,
@@ -50,10 +51,26 @@
 			).done(function (data) {
 				output = jQuery.parseJSON(data);
 				if (output.Stderr != "") {
-					$('#result-holder p').html("<span style='color:red;text-decoration:bold;'>Failed: "+output.Stderr+"</span>");
+					$('#result-holder p').html("<span style='color:red;font-weight:bold;'>Failed: </span><br>"+output.Stderr+"</span>");
 				} else {
-					$('#result-holder').html("<p style='text-decoration:bold;'>Output: <br>"+output.Stdout+"</p>");
+					$('#result-holder').html("<p><span style='font-weight:bold;'>Output: </span><br>"+output.Stdout+"</p>");
 				}
+				$("body").scrollTop( $("body").scrollTop() +1000 );
+			});
+		});
+
+		$("[value='Submit'").click(function () {
+			editor.save();
+			$.post("/problem/" + ((document.location.pathname).split("/"))[2] + "/submit", $( "#submit-code" ).serialize()
+			).done(function (data) {
+				output = jQuery.parseJSON(data);
+				$('#result-holder p').html("");
+				for (var i = 0; i < output.Status.length; i++) {
+					Tstatus = (output.Status[i].Success? "Success":"Failed");
+					$('#result-holder p').append("<span>Testcase " + (i + 1) + ": " + Tstatus + "<\/span><br\/>");
+				};
+				$('#result-holder p').append("<span>Score: +" + output.Score + "<\/span><br\/>");
+				$("body").scrollTop( $("body").scrollTop() +1000 );
 			});
 		});
 	});

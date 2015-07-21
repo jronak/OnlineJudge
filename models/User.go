@@ -180,6 +180,15 @@ func (user *User) Get() bool {
 	return false
 }
 
+func (user *User) GetByUsername() bool {
+	o := orm.NewOrm()
+	o.Using("default")
+	if err := o.Read(user, "Username"); err == nil {
+		return true
+	}
+	return false
+}
+
 func (user *User) LoginVerify() error {
 	var status bool
 	status = CheckUserName(user.Username)

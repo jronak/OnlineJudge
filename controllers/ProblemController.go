@@ -193,7 +193,8 @@ func (this *ProblemController) List() {
 }
 
 // Serves the Problem Page
-// To-do : send the name of author as well - Done
+// To-do: Show recently solved users and their language on sidebar
+// To-do: Later, add least execution time log on sidebar
 func (this *ProblemController) ProblemById() {
 	pid := this.Ctx.Input.Param(":id")
 	id, err := strconv.Atoi(pid)

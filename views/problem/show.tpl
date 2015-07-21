@@ -18,7 +18,7 @@
 			<option value="Pytho3">Python3</option>
 			<option value="Go">Go</option>
 		</select>
-		<div class="right"><input type="button" name="save" value="Save Draft"/><input type="button" name="save" value="Clear Draft"/>&nbsp;&nbsp;&nbsp;<input type="button" value="Run"/><input type="submit"/></div>
+		<div class="right"><input type="button" name="save" value="Save Draft"/><input type="button" name="save" value="Clear Draft"/>&nbsp;&nbsp;&nbsp;<input type="button" value="Run"/><input type="button" value="Submit"/></div>
 	</form>
 	<div class="margin-15" id="result-holder">
 		<p></p>

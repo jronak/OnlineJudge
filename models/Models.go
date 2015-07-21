@@ -55,7 +55,7 @@ type Problemlogs struct {
 
 func init() {
 	orm.RegisterDriver("mysql", orm.DR_MySQL)
-	orm.RegisterDataBase("default", "mysql", "root:admin@/OnlineJudge")
+	orm.RegisterDataBase("default", "mysql", "ronak:ronak@/OnlineJudge")
 	orm.RegisterModel(new(User))
 	orm.RegisterModel(new(Problem))
 	orm.RegisterModel(new(Problemlogs))
