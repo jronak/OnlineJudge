@@ -13,9 +13,11 @@
 			mode: "clike",
 			theme: "ambiance",
 			indentWithTabs: true,
-			value: "// Something",
 		};
 		editor = CodeMirror.fromTextArea(document.getElementById("paste_code"), config);
+
+		if(Cookies.get( ((document.location.pathname).split("/"))[2] + "_C") != null)
+			editor.getDoc().setValue(Cookies.get( ((document.location.pathname).split("/"))[2] + "_C"));
 
 		$("[name='language']").change(function () {
 			switch($("[name='language'] option:selected").text()) {
@@ -26,6 +28,20 @@
 				case 'Python3':
 				case 'Python2': editor.setOption("mode", "python"); break;
 			}
+			if(Cookies.get( ((document.location.pathname).split("/"))[2] + "_" + $("[name='language'] option:selected").text()) != null)
+				editor.getDoc().setValue(Cookies.get( ((document.location.pathname).split("/"))[2] + "_" + $("[name='language'] option:selected").text()));
+			else
+				editor.getDoc().setValue("");
 		});
-	})
+
+		$("[value='Save Draft'").click(function () {
+			editor.save();
+			Cookies.set( ((document.location.pathname).split("/"))[2] + "_" + $("[name='language'] option:selected").text() , $("#paste_code").val());
+		});
+
+		$("[value='Clear Draft'").click(function () {
+			Cookies.remove( ((document.location.pathname).split("/"))[2] + "_" + $("[name='language'] option:selected").text());
+			editor.getDoc().setValue("");
+		});
+	});
 </script>

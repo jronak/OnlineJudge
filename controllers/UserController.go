@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"OnlineJudge/models"
-	//"github.com/astaxie/beego"
 )
 
 type UserController struct {

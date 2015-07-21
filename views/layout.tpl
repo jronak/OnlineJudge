@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="/static/css/960.css">
 	<link rel="stylesheet" type="text/css" href="/static/css/styles.css">
 	<script type="text/javascript" src="/static/js/jquery-2.1.4.min.js"></script>
+	<script type="text/javascript" src="/static/js/js.cookie.js"></script>
 	{{ .HtmlHead }}
 </head>
 
