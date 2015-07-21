@@ -249,6 +249,24 @@ func (this *ProblemController) SaveSubmission() {
 
 }
 
+func (this *ProblemController) RunCode() {
+	if !this.isLoggedIn() {
+		this.Redirect("/user/login", 302)
+		return
+	}
+
+	//uid := this.GetSession("id")
+	pid, _ := strconv.Atoi(this.Ctx.Input.Param(":id"))
+	problem := models.Problem{ Pid: pid }
+	problem.GetByPid()
+	code := this.GetString("code")
+	lang := this.GetString("language")
+	output := models.Exec(pid, code, lang, problem.Sample_input)
+	js, _ := json.Marshal(output)
+	this.Data["json"] = string(js)
+	this.ServeJson()
+}
+
 func (this *ProblemController) isLoggedIn() bool {
 	if this.GetSession("id") != nil {
 		return true

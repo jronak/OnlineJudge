@@ -43,5 +43,18 @@
 			Cookies.remove( ((document.location.pathname).split("/"))[2] + "_" + $("[name='language'] option:selected").text());
 			editor.getDoc().setValue("");
 		});
+
+		$("[value='Run'").click(function () {
+			editor.save();
+			$.post("/problem/" + ((document.location.pathname).split("/"))[2] + "/run", $( "#submit-code" ).serialize()
+			).done(function (data) {
+				output = jQuery.parseJSON(data);
+				if (output.Stderr != "") {
+					$('#result-holder p').html("<span style='color:red;text-decoration:bold;'>Failed: "+output.Stderr+"</span>");
+				} else {
+					$('#result-holder').html("<p style='text-decoration:bold;'>Output: <br>"+output.Stdout+"</p>");
+				}
+			});
+		});
 	});
 </script>
