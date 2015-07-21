@@ -20,6 +20,9 @@ a:hover {
   display: inline-block;
   float: right;
 }
+.bottom-border {
+  border-bottom: solid 1px #DDD;
+}
 
 /* All-through pages styles */
 #logo a {

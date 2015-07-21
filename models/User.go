@@ -41,7 +41,7 @@ func (user *User) IsEmailUnique() bool {
 	return !o.QueryTable("user").Filter("email", user.Password).Exist()
 }
 
-func (user *User) Create() (int64, bool) {
+func (user *User) Create() (int, bool) {
 	o := orm.NewOrm()
 	o.Using("default")
 	password := []byte(user.Password)
@@ -50,7 +50,7 @@ func (user *User) Create() (int64, bool) {
 	uid, err := o.Insert(user)
 	if err == nil {
 		user.Password = ""
-		return uid, true
+		return int(uid), true
 	}
 	return 0, false
 }

@@ -1,10 +1,10 @@
 <!-- Problem Details page -->
 <div class="problem-details">
 	<h4>{{.problem.Statement}}</h4>
-	<p><b>Problem Description</b><br/>{{.problem.Description}}</p>
-	<p><b>Constraints</b><br/>{{.problem.Constraints}}</p>
-	<p><b>Sample Input</b><br/>{{.problem.Sample_input}}</p>
-	<p><b>Sample Output</b><br/>{{.problem.Sample_output}}</p>
+	<p><b>Problem Description</b>{{ if .isEditor }}<a href="/problem/{{.problem.Pid}}/addtest">+</a>{{ end }}<br/>{{str2html .problem.Description}}</p>
+	<p><b>Constraints</b><br/>{{str2html .problem.Constraints}}</p>
+	<p><b>Sample Input</b><br/>{{str2html .problem.Sample_input}}</p>
+	<p><b>Sample Output</b><br/>{{str2html .problem.Sample_output}}</p>
 </div>
 <div class="write-code">
 	<h5>Submit your code</h5>

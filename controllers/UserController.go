@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"OnlineJudge/models"
+	//"github.com/astaxie/beego"
 )
 
 type UserController struct {
@@ -20,13 +21,14 @@ func (this *UserController) Login() {
 			Password: this.GetString("password"),
 		}
 		// Handle the flash messages
-		/*		err := user.LoginVerify()
-				if err != nil {
-					flash := beego.NewFlash()
-					flash.Error(err.Error())
-				}*/
+		// err := user.LoginVerify()
+		// if err != nil {
+		// 	flash := beego.NewFlash()
+		// 	flash.Error(err.Error())
+		// }
 		if user.Login() == true {
 			this.SetSession("Uid", this.GetString("username"))
+			user.GetUserInfo()
 			this.SetSession("id", user.Uid)
 			// store the user ID in the session
 			this.Redirect("/", 302)

@@ -4,7 +4,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-func (testcase *Testcases) Add() bool {
+func (testcase *Testcases) Create() bool {
 	o := orm.NewOrm()
 	o.Using("default")
 	_, err := o.Insert(testcase)

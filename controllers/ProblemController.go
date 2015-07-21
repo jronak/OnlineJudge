@@ -3,9 +3,9 @@ package controllers
 import (
 	"OnlineJudge/models"
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego/orm"
 	"strconv"
+	"strings"
 )
 
 type ProblemTypes struct {
@@ -30,6 +30,7 @@ func (this *ProblemController) ProblemByCategory() {
 	}
 	this.Data["problems"] = problems
 	this.Data["title"] = "Home | List "
+	this.Data["types"], _ = problem.GetTypes()
 
 	this.Layout = "layout.tpl"
 	this.TplNames = "problem/list.tpl"
@@ -74,22 +75,30 @@ func (this *ProblemController) SaveProblem() {
 		return
 	}
 
+	//Redirect if user doesnt hold editor rights
+	id := this.GetSession("id")
+	user := models.User{}
+	user.Uid = id.(int)
+	if !user.IsEditor() {
+		this.Redirect("/", 302)
+		return
+	}
+
 	points, _ := strconv.Atoi(this.GetString("points"))
 	problem := models.Problem{
 		Statement:     this.GetString("statement"),
-		Description:   this.GetString("description"),
-		Constraints:   this.GetString("constraints"),
-		Sample_input:  this.GetString("sample_input"),
-		Sample_output: this.GetString("sample_output"),
+		Description:   strings.Replace(this.GetString("description"),"\n","<br/>",-1),
+		Constraints:   strings.Replace(this.GetString("constraints"),"\n","<br/>",-1),
+		Sample_input:  strings.Replace(this.GetString("sample_input"),"\n","<br/>",-1),
+		Sample_output: strings.Replace(this.GetString("sample_output"),"\n","<br/>",-1),
 		Type:          this.GetString("type"),
 		Difficulty:    this.GetString("difficulty"),
 		Points:        points,
-		Uid:           1,
+		Uid:           id.(int),
 	}
 	id, noerr := problem.Create()
 	if noerr == true {
-		pid := strconv.FormatInt(id, 10)
-		this.Redirect("/problem/"+pid, 301)
+		this.Redirect("/problem/" + id.(string), 302)
 	}
 
 	this.Data["title"] = "Create Problem "
@@ -101,12 +110,80 @@ func (this *ProblemController) SaveProblem() {
 	this.LayoutSections["Sidebar"] = ""
 }
 
+func (this *ProblemController) AddTestCase() {
+	if !this.isLoggedIn() {
+		this.Redirect("/user/login", 302)
+		return
+	}
+
+	//Redirect if user doesnt hold editor rights
+	uid := this.GetSession("id")
+	user := models.User{ Uid: uid.(int) }
+	if !user.IsEditor() {
+		this.Redirect("/", 302)
+		return
+	}
+
+	pid := this.Ctx.Input.Param(":id")
+	id, _ := strconv.Atoi(pid)
+	problem := models.Problem{ Pid: id }
+	problem.GetByPid()
+	this.Data["problem"] = problem
+
+	testcases := models.Testcases{ Pid: id }
+	cases, _ := testcases.GetAllByPid()
+
+	this.Data["title"] = "Add Test Case"
+	this.Data["cases"] = cases
+
+	this.Layout = "layout.tpl"
+	this.TplNames = "problem/addtest.tpl"
+	this.LayoutSections = make(map[string]string)
+	this.LayoutSections["HtmlHead"] = ""
+	this.LayoutSections["Sidebar"] = ""
+
+}
+
+func (this *ProblemController) SaveTestCase() {
+	if !this.isLoggedIn() {
+		this.Redirect("/user/login", 302)
+		return
+	}
+
+	//Redirect if user doesnt hold editor rights
+	uid := this.GetSession("id")
+	user := models.User{ Uid: uid.(int) }
+	if !user.IsEditor() {
+		this.Redirect("/", 302)
+		return
+	}
+
+	pid := this.Ctx.Input.Param(":id")
+	id, _ := strconv.Atoi(pid)
+
+	timeout, _ := strconv.Atoi(this.GetString("timeout"))
+
+	testcase := models.Testcases{
+		Pid: id,
+		Input: strings.Replace(this.GetString("input"),"\n","<br/>",-1),
+		Output: strings.Replace(this.GetString("output"),"\n","<br/>",-1),
+		Timeout: timeout,
+	}
+
+	done := testcase.Create()
+	if done == true {
+		this.Redirect("/problem/" + pid, 302)
+	}
+	this.Redirect("/problem/" + pid + "/addtest", 302)
+}
+
 // Serves the problems list page
 func (this *ProblemController) List() {
 	problem := models.Problem{}
 	problems, _ := problem.GetRecent()
 	this.Data["problems"] = problems
 	this.Data["title"] = "Home | List "
+	this.Data["types"], _ = problem.GetTypes()
 
 	this.Layout = "layout.tpl"
 	this.TplNames = "problem/list.tpl"
@@ -150,7 +227,7 @@ func (this *ProblemController) ProblemById() {
 	this.TplNames = "problem/show.tpl"
 	this.LayoutSections = make(map[string]string)
 	this.LayoutSections["HtmlHead"] = "problem/submit_head.tpl"
-	this.LayoutSections["Sidebar"] = "sidebar/showsimilar.tpl"
+	this.LayoutSections["Sidebar"] = "sidebar/recently_solved_by.tpl"
 }
 
 // Format of submission
@@ -160,12 +237,12 @@ func (this *ProblemController) SaveSubmission() {
 		this.Redirect("/user/login", 302)
 		return
 	}
+
 	uid := this.GetSession("id")
 	pid, _ := strconv.Atoi(this.Ctx.Input.Param(":id"))
-	code := this.Data["code"]
-	lang := this.Data["language"]
-	fmt.Println(pid, uid, code, lang)
-	output := models.SubmitUpdateScore(uid.(int), pid, code.(string), lang.(string))
+	code := this.GetString("code")
+	lang := this.GetString("language")
+	output := models.SubmitUpdateScore(uid.(int), pid, code, lang)
 	js, _ := json.Marshal(output)
 	this.Data["json"] = string(js)
 	this.ServeJson()

@@ -20,6 +20,9 @@
 				<div class="login-button">
 					{{ if .logged }}
 						<a href="/user/{{ .login }}">{{ .login }}</a> <a href="/user/logout">(logout)</a>
+						{{ if .isEditor }}
+							<a href="/problem/create">+</a>
+						{{ end }}
 					{{ else }}
 						<a href="/user/login">Login or Sign up</a>
 					{{ end }}
@@ -28,6 +31,12 @@
 		</div>
 
 		<div class="clear"></div>
+
+		<div class="grid_24">
+			<p><span style="color:red;"> {{.flash.error}} </span>
+				<span style="color:yellow;"> {{.flash.warning}} </span>
+				<span style="color:blue;"> {{.flash.notice}} </span></p>
+		</div>
 
 		<div class="grid_18">
 			<div id="content">
