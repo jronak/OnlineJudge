@@ -3,6 +3,7 @@
 <script src="/static/CodeMirror/addon/display/placeholder.js"></script>
 <script src="/static/CodeMirror/mode/clike/clike.js"></script>
 <script src="/static/CodeMirror/mode/go/go.js"></script>
+<script src="/static/CodeMirror/mode/python/python.js"></script>
 <link rel="stylesheet" href="/static/CodeMirror/lib/codemirror.css">
 <link rel="stylesheet" href="/static/CodeMirror/theme/ambiance.css">
 <script type="text/javascript">
@@ -22,6 +23,8 @@
 				case 'C':
 				case 'Java': editor.setOption("mode", "clike"); break;
 				case 'Go': editor.setOption("mode", "go"); break;
+				case 'Python3':
+				case 'Python2': editor.setOption("mode", "python"); break;
 			}
 		});
 	})
