@@ -97,8 +97,9 @@ func (this *ProblemController) SaveProblem() {
 		Uid:           id.(int),
 	}
 	id, noerr := problem.Create()
+	pid := strconv.Itoa(id.(int))
 	if noerr == true {
-		this.Redirect("/problem/" + id.(string), 302)
+		this.Redirect("/problem/" + pid, 302)
 	}
 
 	this.Data["title"] = "Create Problem "

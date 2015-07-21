@@ -5,12 +5,12 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-func (problem *Problem) Create() (int64, bool) {
+func (problem *Problem) Create() (int, bool) {
 	o := orm.NewOrm()
 	o.Using("default")
 	id, err := o.Insert(problem)
 	if err == nil {
-		return id, true
+		return int(id), true
 	}
 	beego.Error(err)
 	return 0, false
