@@ -85,6 +85,7 @@ func (this *ProblemController) SaveProblem() {
 	}
 
 	points, _ := strconv.Atoi(this.GetString("points"))
+	//remove replace foe newlines
 	problem := models.Problem{
 		Statement:     this.GetString("statement"),
 		Description:   strings.Replace(this.GetString("description"),"\n","<br/>",-1),
@@ -163,7 +164,7 @@ func (this *ProblemController) SaveTestCase() {
 	id, _ := strconv.Atoi(pid)
 
 	timeout, _ := strconv.Atoi(this.GetString("timeout"))
-
+	//remove string replace
 	testcase := models.Testcases{
 		Pid: id,
 		Input: strings.Replace(this.GetString("input"),"\n","<br/>",-1),
@@ -263,7 +264,10 @@ func (this *ProblemController) RunCode() {
 	problem.GetByPid()
 	code := this.GetString("code")
 	lang := this.GetString("language")
-	output := models.Exec(pid, code, lang, problem.Sample_input)
+	//We can accept custom inputs from user as well.
+	//If stdin is empty problem sample io is used
+	stdin := this.GetString("stdin")
+	output := models.Exec(pid, code, lang, stdin)
 	js, _ := json.Marshal(output)
 	this.Data["json"] = string(js)
 	this.ServeJson()
