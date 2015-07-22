@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/orm"
 	"strconv"
-	"strings"
 )
 
 type ProblemTypes struct {
@@ -87,10 +86,10 @@ func (this *ProblemController) SaveProblem() {
 	points, _ := strconv.Atoi(this.GetString("points"))
 	problem := models.Problem{
 		Statement:     this.GetString("statement"),
-		Description:   strings.Replace(this.GetString("description"),"\n","<br/>",-1),
-		Constraints:   strings.Replace(this.GetString("constraints"),"\n","<br/>",-1),
-		Sample_input:  strings.Replace(this.GetString("sample_input"),"\n","<br/>",-1),
-		Sample_output: strings.Replace(this.GetString("sample_output"),"\n","<br/>",-1),
+		Description:   this.GetString("description"),
+		Constraints:   this.GetString("constraints"),
+		Sample_input:  this.GetString("sample_input"),
+		Sample_output: this.GetString("sample_output"),
 		Type:          this.GetString("type"),
 		Difficulty:    this.GetString("difficulty"),
 		Points:        points,
@@ -166,8 +165,8 @@ func (this *ProblemController) SaveTestCase() {
 
 	testcase := models.Testcases{
 		Pid: id,
-		Input: strings.Replace(this.GetString("input"),"\n","<br/>",-1),
-		Output: strings.Replace(this.GetString("output"),"\n","<br/>",-1),
+		Input: this.GetString("input"),
+		Output: this.GetString("output"),
 		Timeout: timeout,
 	}
 
@@ -263,7 +262,8 @@ func (this *ProblemController) RunCode() {
 	problem.GetByPid()
 	code := this.GetString("code")
 	lang := this.GetString("language")
-	output := models.Exec(pid, code, lang, problem.Sample_input)
+	stdin := this.GetString("stdin")
+	output := models.Exec(pid, code, lang, stdin)
 	js, _ := json.Marshal(output)
 	this.Data["json"] = string(js)
 	this.ServeJson()

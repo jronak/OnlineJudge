@@ -1,10 +1,10 @@
 <!-- Add Testcase Page -->
 <div class="margin-15">
-	<h4>Tests Present for <a href="/problem/{{.problem.Pid}}">{{.problem.Statement}}</a></h4>
+	<h4>Tests Present for <a href="/problem/{{.problem.Pid}}">{{str2html (.problem.Statement | n2br)}}</a></h4>
 	{{range $key, $val := .cases}}
 		<div class="margin-15 bottom-border">
-			<p><b>Input:</b><br/>{{str2html .Input}}<br/>
-				<b>Output:</b><br/>{{str2html .Output}}<br/>
+			<p><b>Input:</b><br/>{{str2html (.Input | n2br)}}<br/>
+				<b>Output:</b><br/>{{str2html (.Output | n2br)}}<br/>
 				<b>Timeout:</b><br/>{{.Timeout}}<br/>
 			</p>
 		</div>

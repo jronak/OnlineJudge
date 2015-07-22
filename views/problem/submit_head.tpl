@@ -40,6 +40,10 @@
 			Cookies.set( ((document.location.pathname).split("/"))[2] + "_" + $("[name='language'] option:selected").text() , $("#paste_code").val());
 		});
 
+		$("[value='Add Custom Input'").click(function () {
+			$('[name="stdin"]').show();
+		});
+
 		$("[value='Clear Draft'").click(function () {
 			Cookies.remove( ((document.location.pathname).split("/"))[2] + "_" + $("[name='language'] option:selected").text());
 			editor.getDoc().setValue("");
