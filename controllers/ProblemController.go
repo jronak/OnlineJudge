@@ -84,6 +84,7 @@ func (this *ProblemController) SaveProblem() {
 	}
 
 	points, _ := strconv.Atoi(this.GetString("points"))
+	//remove replace foe newlines
 	problem := models.Problem{
 		Statement:     this.GetString("statement"),
 		Description:   this.GetString("description"),
@@ -162,7 +163,7 @@ func (this *ProblemController) SaveTestCase() {
 	id, _ := strconv.Atoi(pid)
 
 	timeout, _ := strconv.Atoi(this.GetString("timeout"))
-
+	//remove string replace
 	testcase := models.Testcases{
 		Pid: id,
 		Input: this.GetString("input"),
