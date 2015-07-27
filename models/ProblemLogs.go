@@ -34,6 +34,17 @@ func (log *Problemlogs) GetByPidUid() bool {
 	return false
 }
 
+func (log *Problemlogs) GetByUid() ([]Problemlogs, int64) {
+	var logs []Problemlogs
+	o := orm.NewOrm()
+	o.Using("default")
+	count, err := o.QueryTable("problemlogs").OrderBy("-Time").Filter("uid", log.Uid).All(&logs)
+	if err == nil {
+		return logs, count
+	}
+	return nil, count
+}
+
 func (log *Problemlogs) GetRecentByPid() ([]Problemlogs, int64) {
 	var logs []Problemlogs
 	o := orm.NewOrm()

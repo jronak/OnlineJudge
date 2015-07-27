@@ -97,6 +97,22 @@ func (this *UserController) Show() {
 		this.Data["title"] = user.Username
 		this.Data["userDetails"] = user
 
+		log := models.Problemlogs{Uid: user.Uid}
+		logs, count := log.GetByUid()
+		problems := make(map[int]models.Problem)
+		if count == 0 {
+			this.Data["solvedProblemsExist"] = false
+		} else {
+			this.Data["solvedProblemsExist"] = true
+			for index,element := range logs {
+				p := models.Problem{Pid: element.Pid}
+				p.GetByPid()
+				problems[index] = p
+			}
+		}
+
+		this.Data["solvedProblems"] = problems
+
 		this.Layout = "layout.tpl"
 		this.TplNames = "user/show.tpl"
 		this.LayoutSections = make(map[string]string)
