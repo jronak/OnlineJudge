@@ -34,8 +34,12 @@ func SubmitUpdateScore(uid int, pid int, rawcode string, lang string) SubmitResp
 		problemlog.CommitByPidUid()
 		problem.Solve_count++
 		problem.Update()
+		user := User{ Uid: uid }
+		user.AddScore(score)
 	} else {
 		if problemlog.Points < score {
+			user := User{ Uid: uid }
+			user.AddScore(score - problemlog.Points)
 			problemlog.Points = score
 			problemlog.Solved++
 			problemlog.Update()
