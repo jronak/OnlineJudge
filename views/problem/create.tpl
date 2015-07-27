@@ -21,7 +21,7 @@
 			<option value=10>10</option>
 			<option value=20>20</option>
 			<option value=30>30</option>
-		</label><br/><br/>
+		</select></label><br/><br/>
 		<input type="submit">
 	</form>
 </div>

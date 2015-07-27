@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"OnlineJudge/models"
+	"github.com/astaxie/beego"
 )
 
 type UserController struct {
@@ -20,13 +21,15 @@ func (this *UserController) Login() {
 			Password: this.GetString("password"),
 		}
 		// Handle the flash messages
-		/*		err := user.LoginVerify()
-				if err != nil {
-					flash := beego.NewFlash()
-					flash.Error(err.Error())
-				}*/
+		err := user.LoginVerify()
+		if err != nil {
+			flash := beego.NewFlash()
+			flash.Error(err.Error())
+			flash.Store(&this.Controller)
+		}
 		if user.Login() == true {
 			this.SetSession("Uid", this.GetString("username"))
+			user.GetUserInfo()
 			this.SetSession("id", user.Uid)
 			// store the user ID in the session
 			this.Redirect("/", 302)
@@ -41,6 +44,7 @@ func (this *UserController) Login() {
 	this.LayoutSections = make(map[string]string)
 	this.LayoutSections["HtmlHead"] = ""
 	this.LayoutSections["Sidebar"] = ""
+	this.LayoutSections["ErrorHead"] = "errorHead.tpl"
 }
 
 func (this *UserController) Logout() {
@@ -66,12 +70,13 @@ func (this *UserController) Signup() {
 		College:  this.GetString("college"),
 		Email:    this.GetString("email"),
 	}
-	/*All the fields verified, as well checked if username and email are unique
+	// All the fields verified, as well checked if username and email are unique
 	err := user.SignupVerify()
 	if err!= nil{
 		flash := beego.NewFlash()
-		flash.Error(err.Error())*
-	}*/
+		flash.Error(err.Error())
+		flash.Store(&this.Controller)
+	}
 	uid, done := user.Create()
 
 	if done {
@@ -80,4 +85,40 @@ func (this *UserController) Signup() {
 		this.Redirect("/", 302)
 	}
 	this.Redirect("/user/login", 302)
+}
+
+// To-do: Show programs solved by the user
+func (this *UserController) Show() {
+	if this.Ctx.Input.Param("0") == "" {
+		this.Abort("404")
+	}
+	user := models.User{ Username: this.Ctx.Input.Param("0") }
+	if user.GetByUsername() {
+		this.Data["title"] = user.Username
+		this.Data["userDetails"] = user
+
+		log := models.Problemlogs{Uid: user.Uid}
+		logs, count := log.GetByUid()
+		problems := make(map[int]models.Problem)
+		if count == 0 {
+			this.Data["solvedProblemsExist"] = false
+		} else {
+			this.Data["solvedProblemsExist"] = true
+			for index,element := range logs {
+				p := models.Problem{Pid: element.Pid}
+				p.GetByPid()
+				problems[index] = p
+			}
+		}
+
+		this.Data["solvedProblems"] = problems
+
+		this.Layout = "layout.tpl"
+		this.TplNames = "user/show.tpl"
+		this.LayoutSections = make(map[string]string)
+		this.LayoutSections["HtmlHead"] = ""
+		this.LayoutSections["Sidebar"] = ""
+	} else {
+		this.Abort("404")
+	}
 }

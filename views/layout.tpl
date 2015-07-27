@@ -19,7 +19,10 @@
 			<div class="grid_5 prefix_14 omega">
 				<div class="login-button">
 					{{ if .logged }}
-						<a href="/user/{{ .login }}">{{ .login }}</a> <a href="/user/logout">(logout)</a>
+						<a href="/user/show/{{ .login }}">{{ .login }}</a> <a href="/user/logout">(logout)</a>
+						{{ if .isEditor }}
+							<a href="/problem/create">+</a>
+						{{ end }}
 					{{ else }}
 						<a href="/user/login">Login or Sign up</a>
 					{{ end }}
@@ -28,6 +31,8 @@
 		</div>
 
 		<div class="clear"></div>
+
+		{{ .ErrorHead }}
 
 		<div class="grid_18">
 			<div id="content">

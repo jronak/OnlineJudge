@@ -5,12 +5,12 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-func (problem *Problem) Create() (int64, bool) {
+func (problem *Problem) Create() (int, bool) {
 	o := orm.NewOrm()
 	o.Using("default")
 	id, err := o.Insert(problem)
 	if err == nil {
-		return id, true
+		return int(id), true
 	}
 	beego.Error(err)
 	return 0, false
@@ -101,8 +101,7 @@ func (problem *Problem) GetByType(page int) ([]Problem, int64) {
 	var problems []Problem
 	o := orm.NewOrm()
 	o.Using("default")
-	count, err := o.QueryTable("problem").Filter("type", problem.Type).Offset((page-1)*10).Limit(10).All(&problems, "pid", "statement", "type",
-		"difficulty", "points", "solve_count")
+	count, err := o.QueryTable("problem").Filter("type", problem.Type).Offset((page-1)*10).Limit(10).All(&problems)
 	if err == nil {
 		return problems, count
 	}
