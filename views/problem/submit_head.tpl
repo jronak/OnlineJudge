@@ -57,7 +57,9 @@
 				if (output.Stderr != "") {
 					$('#result-holder p').html("<span style='color:red;font-weight:bold;'>Failed: </span><br>"+output.Stderr+"</span>");
 				} else {
-					$('#result-holder').html("<p><span style='font-weight:bold;'>Output: </span><br>"+output.Stdout+"</p>");
+					if (output.CompilationStatus) output.CompilationStatus = "Sucess"; else output.CompilationStatus = "Failed";
+					if (output.RunStatus) output.RunStatus = "Sucess"; else output.RunStatus = "Failed";
+					$('#result-holder').html("<p><span style='font-weight:bold;'>Compilation Status: </span>"+output.CompilationStatus+"<br><span style='font-weight:bold;'>Run Status: </span>"+output.RunStatus+"<br><span style='font-weight:bold;'>Output: </span><br>"+output.Stdout+"</p>");
 				}
 				$("body").scrollTop( $("body").scrollTop() +1000 );
 			});
