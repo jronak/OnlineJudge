@@ -32,11 +32,7 @@
 
 		<div class="clear"></div>
 
-		<div class="grid_24">
-			<p><span style="color:red;"> {{.flash.error}} </span>
-				<span style="color:yellow;"> {{.flash.warning}} </span>
-				<span style="color:blue;"> {{.flash.notice}} </span></p>
-		</div>
+		{{ .ErrorHead }}
 
 		<div class="grid_18">
 			<div id="content">

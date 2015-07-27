@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"OnlineJudge/models"
-	//"github.com/astaxie/beego"
+	"github.com/astaxie/beego"
 )
 
 type UserController struct {
@@ -21,11 +21,12 @@ func (this *UserController) Login() {
 			Password: this.GetString("password"),
 		}
 		// Handle the flash messages
-		// err := user.LoginVerify()
-		// if err != nil {
-		// 	flash := beego.NewFlash()
-		// 	flash.Error(err.Error())
-		// }
+		err := user.LoginVerify()
+		if err != nil {
+			flash := beego.NewFlash()
+			flash.Error(err.Error())
+			flash.Store(&this.Controller)
+		}
 		if user.Login() == true {
 			this.SetSession("Uid", this.GetString("username"))
 			user.GetUserInfo()
@@ -43,6 +44,7 @@ func (this *UserController) Login() {
 	this.LayoutSections = make(map[string]string)
 	this.LayoutSections["HtmlHead"] = ""
 	this.LayoutSections["Sidebar"] = ""
+	this.LayoutSections["ErrorHead"] = "errorHead.tpl"
 }
 
 func (this *UserController) Logout() {
@@ -68,12 +70,13 @@ func (this *UserController) Signup() {
 		College:  this.GetString("college"),
 		Email:    this.GetString("email"),
 	}
-	/*All the fields verified, as well checked if username and email are unique
+	// All the fields verified, as well checked if username and email are unique
 	err := user.SignupVerify()
 	if err!= nil{
 		flash := beego.NewFlash()
-		flash.Error(err.Error())*
-	}*/
+		flash.Error(err.Error())
+		flash.Store(&this.Controller)
+	}
 	uid, done := user.Create()
 
 	if done {
