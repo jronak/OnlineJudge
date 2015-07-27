@@ -206,6 +206,20 @@ func (this *ProblemController) ProblemById() {
 	p := models.Problem{Pid: id}
 	p.GetById()
 
+	log := models.Problemlogs{Pid: id}
+	logs, count := log.GetRecentByPid()
+	users := make(map[int]models.User)
+	if count == 0 {
+		this.Data["recentlySolvedUsersExist"] = false
+	} else {
+		this.Data["recentlySolvedUsersExist"] = true
+		for index,element := range logs {
+			u := models.User{Uid: element.Uid}
+			u.GetUserInfo()
+			users[index] = u
+		}
+	}
+
 	//Author added
 	user := models.User{}
 	user.Uid = p.Uid
@@ -213,6 +227,7 @@ func (this *ProblemController) ProblemById() {
 	this.Data["title"] = p.Statement
 	this.Data["problem"] = p
 	this.Data["Author"] = user.Username
+	this.Data["recentlySolvedUsers"] = users
 
 	// Handle problem log of a user
 	if this.isLoggedIn() {
