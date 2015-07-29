@@ -41,15 +41,14 @@ var (
 	cChannel    chan CompilerResponse
 	javaChannel chan CompilerResponse
 	cppChannel  chan CompilerResponse
-	goChannel   chan CompilerResponse
 )
 
 const (
 	statusPass        = 0
 	statusFail        = 1
 	statusUnknown     = 2
-	compilationTimout = 10 //2 seconds
-	workerPoolSize    = 10
+	compilationTimout = 5 //2 seconds
+	workerPoolSize    = 2
 	channelBufferSize = 2 * workerPoolSize
 )
 
@@ -107,13 +106,6 @@ func cpp_command(code *Code) *exec.Cmd {
 	objPath := code.path + code.name
 	codePath := code.path + code.name + ".cpp"
 	return exec.Command(compiler, options, objPath, codePath)
-}
-
-func go_command(code *Code) *exec.Cmd {
-	compiler := "go"
-	options := "build"
-	codePath := code.path + code.name + ".go"
-	return exec.Command(compiler, options, codePath)
 }
 
 // 	Compiles the code
@@ -212,16 +204,14 @@ func init() {
 	javaChannel = make(chan CompilerResponse, channelBufferSize)
 	cChannel = make(chan CompilerResponse, channelBufferSize)
 	cppChannel = make(chan CompilerResponse, channelBufferSize)
-	goChannel = make(chan CompilerResponse, channelBufferSize)
-	compileChannels = [](chan CompilerResponse){cChannel, javaChannel, cppChannel, goChannel}
+	compileChannels = [](chan CompilerResponse){cChannel, javaChannel, cppChannel}
 	compileChannelMap = make(map[string]chan CompilerResponse)
 	CompileCommandMap = make(map[string]func(*Code) *exec.Cmd)
-	compilableLangs = []string{"C", "Java", "C++", "Go"}
+	compilableLangs = []string{"C", "Java", "C++"}
 	compileCommands = [](func(code *Code) *exec.Cmd){
 		c_command,
 		java_command,
-		cpp_command,
-		go_command}
+		cpp_command}
 	for iter, Lang := range compilableLangs {
 		CompileCommandMap[Lang] = compileCommands[iter]
 		compileChannelMap[Lang] = compileChannels[iter]

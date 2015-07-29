@@ -1,57 +1,54 @@
 package models
 
 import (
-	"OnlineJudge/Judge"
+	"OnlineJudge/Bridge"
+	"fmt"
 )
 
 // Just run code used here. if stdin is nil, then sample input is used
-func Exec(pid int, rawCode string, lang string, stdin string) Judge.Code {
-	code := Judge.Code{Lang: lang, Stdin: stdin}
-	cr := Judge.CRManager{Program: &code, RawCode: &rawCode}
+func Exec(pid int, rawCode string, lang string, stdin string) Bridge.Code {
+	code := Bridge.Code{Lang: lang, Stdin: stdin}
+	cr := Bridge.CRManager{Program: &code, RawCode: &rawCode}
 	if stdin == "" {
 		problem := new(Problem)
 		problem.Pid = pid
 		if err := problem.GetSampleIOByPid(); err != true {
-			return Judge.Code{}
+			return Bridge.Code{}
 		}
 		code.Stdin = problem.Sample_input
-		cr.CROnce()
+		Bridge.CompileExec(&cr)
+		fmt.Println(cr, *cr.Program, *cr.RawCode)
 		if code.Stdout != problem.Sample_output {
 			code.RunStatus = false
 		}
 	} else {
-		cr.CROnce()
+		Bridge.CompileExec(&cr)
 	}
 	return code
 }
 
-func ExecBatch(pid int, rawcode string, lang string) []Judge.TestCaseStatus {
+func ExecBatch(pid int, rawcode string, lang string) []Bridge.TestCaseStatus {
 	testcase := Testcases{}
 	testcase.Pid = pid
 	testcases, count := testcase.GetAllByPid()
-	j := Judge.TestCaseStatus{}
+	j := Bridge.TestCaseStatus{}
 	j.Comment = "Internal Error"
 	j.Success = false
 	if count == 0 {
-		return []Judge.TestCaseStatus{j}
+		return []Bridge.TestCaseStatus{j}
 	}
-	testStatus := make([]Judge.TestCaseStatus, count)
-	code := Judge.Code{}
+	code := Bridge.Code{}
 	code.Lang = lang
-	cr := Judge.CRManager{}
+	cr := Bridge.CRManager{}
 	cr.RawCode = &rawcode
 	cr.Program = &code
-	cr.CRBatch()
-	compileStatus := <-cr.Receive
-	if compileStatus == 1 {
-		j.Comment = "Compilation Error"
-		return []Judge.TestCaseStatus{j}
-	}
+	cr.Isbatch = true
+	testInput := make([]string, count)
+	testOutput := make([]string, count)
 	for i, test := range testcases {
-		cr.Stdin <- test.Input
-		cr.Stdout <- test.Output
-		testStatus[i] = <-cr.Status
+		testInput[i] = test.Input
+		testOutput[i] = test.Output
 	}
-	close(cr.Stdin)
-	return testStatus
+	Bridge.CompileExec(&cr)
+	return cr.TestCaseOutput
 }

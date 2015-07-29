@@ -23,7 +23,7 @@ type TestCaseStatus struct {
 const (
 	defaultExecTimeout       time.Duration = time.Second * 2
 	defaultExecTimeoutScript time.Duration = time.Second * 5
-	runWorkPoolSize                        = 5
+	runWorkPoolSize                        = 2
 	runChannelSize                         = 2 * runWorkPoolSize
 )
 
@@ -82,8 +82,10 @@ func cpp_run(code *Code) *exec.Cmd {
 
 //Go exec command : format "go run PATH+FILENAME+.py"
 func go_run(code *Code) *exec.Cmd {
-	toRun := code.path + code.name
-	return exec.Command(toRun)
+	executor := "go"
+	option := "run"
+	toRun := code.path + code.name + codeExtensionsMap[code.Lang]
+	return exec.Command(executor, option, toRun)
 }
 
 //Error checker
@@ -144,62 +146,6 @@ func run(channel chan RunResponse) {
 	}
 }
 
-/*
-func run(statusChannel chan int, code *Code) {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Print("Run Error: Lang:", code.Lang)
-			statusChannel <- statusUnknown
-		}
-	}()
-	function, e := RunCommandMap[code.Lang]
-	if e != true {
-		panic("Run: Panic Encountered Lang:" + code.Lang)
-	}
-	cmd := function(code)
-	stdinPipe, err := cmd.StdinPipe()
-	CheckError(err)
-	stdoutPipe, err := cmd.StdoutPipe()
-	CheckError(err)
-	stderrPipe, err := cmd.StderrPipe()
-	CheckError(err)
-	cmd.Start()
-	go func() {
-		io.WriteString(stdinPipe, code.Stdin)
-		stdinPipe.Close()
-	}()
-	go func() {
-		bytes, _ := ioutil.ReadAll(stdoutPipe)
-		code.Stdout = string(bytes)
-		stdoutPipe.Close()
-	}()
-	go func() {
-		bytes, _ := ioutil.ReadAll(stderrPipe)
-		code.Stderr = string(bytes)
-		stderrPipe.Close()
-	}()
-	channel := make(chan int)
-	go func() {
-		cmd.Wait()
-		channel <- statusPass
-		code.ExecTime = cmd.ProcessState.UserTime().Seconds()
-	}()
-	// If channel responds, execution success or failure is found by contents of stderr
-	// If statusChannel responds, exection abort
-	select {
-	case <-channel:
-		if code.Stderr != "" {
-			statusChannel <- statusFail
-		} else {
-			statusChannel <- statusPass
-		}
-	case <-statusChannel:
-		cmd.Process.Kill()
-		statusChannel <- statusFail
-	}
-}
-*/
-
 func (code *Code) RunManager() {
 	res := RunResponse{code: code, runResponse: make(chan int)}
 	langChannel := runChannelMap[code.Lang]
@@ -213,55 +159,30 @@ func (cr *CRManager) RunBatchManager() {
 	langChannel := runChannelMap[code.Lang]
 	code.execTimeLimit = defaultExecTimeout
 	status := TestCaseStatus{}
-	for stdin := range cr.Stdin {
+	for stdin := range cr.stdin {
 		code.Stdin = stdin
 		langChannel <- res
 		<-res.runResponse
 		status.ExecTime = code.ExecTime
 		if code.RunStatus == true {
-			if code.Stdout == <-cr.Stdout {
+			if code.Stdout == <-cr.stdout {
 				status.Success = true
 				status.Comment = "Correct"
-				cr.Status <- status
+				cr.status <- status
 			} else {
 				status.Success = false
 				status.Comment = "Wrong Answer"
-				cr.Status <- status
+				cr.status <- status
 			}
 		} else {
 			status.Success = false
 			status.Comment = code.Stderr
-			<-cr.Stdout
-			cr.Status <- status
+			<-cr.stdout
+			cr.status <- status
 		}
 	}
 }
 
-/*
-//Execution Manager
-func (code *Code) RunManager() {
-	var execTime time.Duration
-	statusChannel := make(chan int)
-	if code.execTimeLimit == 0 {
-		execTime = defaultExecTimeout
-	} else {
-		execTime = code.execTimeLimit
-	}
-	go run(statusChannel, code)
-	select {
-	case response := <-statusChannel:
-		if response == statusPass {
-			code.RunStatus = true
-		} else if response == statusFail {
-			log.Println("Run Error: Run Failed")
-		}
-	case <-time.After(time.Second * execTime):
-		log.Println("Run : Execution Timeout")
-		statusChannel <- statusUnknown
-		<-statusChannel
-	}
-}
-*/
 func init() {
 
 	runChannelMap = make(map[string]chan RunResponse)

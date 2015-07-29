@@ -1,13 +1,13 @@
 package models
 
 import (
-	"OnlineJudge/Judge"
+	"OnlineJudge/Bridge"
 	"time"
 )
 
 type SubmitResponse struct {
 	Score  int
-	Status []Judge.TestCaseStatus
+	Status []Bridge.TestCaseStatus
 }
 
 func SubmitUpdateScore(uid int, pid int, rawcode string, lang string) SubmitResponse {
@@ -34,11 +34,11 @@ func SubmitUpdateScore(uid int, pid int, rawcode string, lang string) SubmitResp
 		problemlog.CommitByPidUid()
 		problem.Solve_count++
 		problem.Update()
-		user := User{ Uid: uid }
+		user := User{Uid: uid}
 		user.AddScore(score)
 	} else {
 		if problemlog.Points < score {
-			user := User{ Uid: uid }
+			user := User{Uid: uid}
 			user.AddScore(score - problemlog.Points)
 			problemlog.Points = score
 			problemlog.Solved++
@@ -49,7 +49,7 @@ func SubmitUpdateScore(uid int, pid int, rawcode string, lang string) SubmitResp
 	return submitResponse
 }
 
-func computeScore(maxScore int, testCaseStatus []Judge.TestCaseStatus) int {
+func computeScore(maxScore int, testCaseStatus []Bridge.TestCaseStatus) int {
 	casePassed := 0
 	for _, status := range testCaseStatus {
 		if status.Success == true {

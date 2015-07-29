@@ -171,6 +171,17 @@ func (user *User) UpdateRank(rank int) bool {
 	return false
 }
 
+func (user *User) SearchByName() ([]User, int64) {
+	var users []User
+	o := orm.NewOrm()
+	o.Using("default")
+	count, err := o.Raw("select * from user where name like ?", "%"+user.Name+"%").QueryRows(&users)
+	if err != nil {
+		return nil, 0
+	}
+	return users, count
+}
+
 func (user *User) Get() bool {
 	o := orm.NewOrm()
 	o.Using("default")
@@ -200,6 +211,17 @@ func (user *User) LoginVerify() error {
 		return passwordError
 	}
 	return nil
+}
+
+func (user *User) GetEditors() []User {
+	var users []User
+	o := orm.NewOrm()
+	o.Using("default")
+	_, err := o.QueryTable("user").Filter("is_editor", 1).All(&users)
+	if err != nil {
+		return nil
+	}
+	return users
 }
 
 func (user *User) SignupVerify() error {
