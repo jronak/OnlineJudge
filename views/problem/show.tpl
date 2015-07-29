@@ -16,7 +16,7 @@
 			<option value="C++">C++</option>
 			<option value="Java">Java</option>
 			<option value="Python2">Python2</option>
-			<option value="Pytho3">Python3</option>
+			<option value="Python3">Python3</option>
 			<option value="Go">Go</option>
 		</select>
 		<div class="right"><input type="button" name="save" value="Save Draft"/><input type="button" name="save" value="Clear Draft"/>&nbsp;&nbsp;&nbsp;<input type="button" value="Add Custom Input"/><input type="button" value="Run"/>&nbsp;&nbsp;&nbsp;<input type="button" value="Submit"/></div>
