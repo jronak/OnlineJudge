@@ -53,6 +53,22 @@ type Problemlogs struct {
 	Time   time.Time `orm:"auto_now_add;type(datetime)"`
 }
 
+type Contest struct {
+	Id          int `orm:"pk"`
+	Name        string
+	Description string
+	StartTime   time.Time
+	EndTime     time.Time
+}
+
+type Contestlogs struct {
+	Id     int `orm:"pk"`
+	Uid    int
+	Cid    int
+	Points int
+	Time   time.Time `orm:"auto_now_add;type(datetime)"`
+}
+
 func init() {
 	orm.RegisterDriver("mysql", orm.DR_MySQL)
 	orm.RegisterDataBase("default", "mysql", "ronak:ronak@/OnlineJudge")
@@ -60,4 +76,6 @@ func init() {
 	orm.RegisterModel(new(Problem))
 	orm.RegisterModel(new(Problemlogs))
 	orm.RegisterModel(new(Testcases))
+	orm.RegisterModel(new(Contest))
+	orm.RegisterModel(new(Contestlogs))
 }

@@ -99,7 +99,7 @@ func (this *ProblemController) SaveProblem() {
 	id, noerr := problem.Create()
 	pid := strconv.Itoa(id.(int))
 	if noerr == true {
-		this.Redirect("/problem/" + pid, 302)
+		this.Redirect("/problem/"+pid, 302)
 	}
 
 	this.Data["title"] = "Create Problem "
@@ -119,7 +119,7 @@ func (this *ProblemController) AddTestCase() {
 
 	//Redirect if user doesnt hold editor rights
 	uid := this.GetSession("id")
-	user := models.User{ Uid: uid.(int) }
+	user := models.User{Uid: uid.(int)}
 	if !user.IsEditor() {
 		this.Redirect("/", 302)
 		return
@@ -127,11 +127,11 @@ func (this *ProblemController) AddTestCase() {
 
 	pid := this.Ctx.Input.Param(":id")
 	id, _ := strconv.Atoi(pid)
-	problem := models.Problem{ Pid: id }
+	problem := models.Problem{Pid: id}
 	problem.GetByPid()
 	this.Data["problem"] = problem
 
-	testcases := models.Testcases{ Pid: id }
+	testcases := models.Testcases{Pid: id}
 	cases, _ := testcases.GetAllByPid()
 
 	this.Data["title"] = "Add Test Case"
@@ -153,7 +153,7 @@ func (this *ProblemController) SaveTestCase() {
 
 	//Redirect if user doesnt hold editor rights
 	uid := this.GetSession("id")
-	user := models.User{ Uid: uid.(int) }
+	user := models.User{Uid: uid.(int)}
 	if !user.IsEditor() {
 		this.Redirect("/", 302)
 		return
@@ -165,17 +165,17 @@ func (this *ProblemController) SaveTestCase() {
 	timeout, _ := strconv.Atoi(this.GetString("timeout"))
 	//remove string replace
 	testcase := models.Testcases{
-		Pid: id,
-		Input: this.GetString("input"),
-		Output: this.GetString("output"),
+		Pid:     id,
+		Input:   this.GetString("input"),
+		Output:  this.GetString("output"),
 		Timeout: timeout,
 	}
 
 	done := testcase.Create()
 	if done == true {
-		this.Redirect("/problem/" + pid, 302)
+		this.Redirect("/problem/"+pid, 302)
 	}
-	this.Redirect("/problem/" + pid + "/addtest", 302)
+	this.Redirect("/problem/"+pid+"/addtest", 302)
 }
 
 // Serves the problems list page
@@ -213,7 +213,7 @@ func (this *ProblemController) ProblemById() {
 		this.Data["recentlySolvedUsersExist"] = false
 	} else {
 		this.Data["recentlySolvedUsersExist"] = true
-		for index,element := range logs {
+		for index, element := range logs {
 			u := models.User{Uid: element.Uid}
 			u.GetUserInfo()
 			users[index] = u
@@ -274,7 +274,7 @@ func (this *ProblemController) RunCode() {
 
 	//uid := this.GetSession("id")
 	pid, _ := strconv.Atoi(this.Ctx.Input.Param(":id"))
-	problem := models.Problem{ Pid: pid }
+	problem := models.Problem{Pid: pid}
 	problem.GetByPid()
 	code := this.GetString("code")
 	lang := this.GetString("language")

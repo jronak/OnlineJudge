@@ -66,4 +66,28 @@ CREATE TABLE IF NOT EXISTS `problemlogs`(
 	 ON DELETE CASCADE    
 )ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS `contest`(
+	`id` int AUTO_INCREMENT PRIMARY KEY,
+	`name` varchar(30) NOT NULL,
+	`description` mediumtext NOT NULL,
+	`startTime` datetime NOT NULL,
+	`endTime` datetime NOT NULL
+)ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `contestlogs`(
+	`id` int AUTO_INCREMENT PRIMARY KEY,
+	`uid` int NOT NULL,
+	`cid` int NOT NULL,
+	`points` int NOT NULL,
+	`time` datetime NOT NULL,
+	FOREIGN KEY `fk_user`(`uid`)
+	REFERENCES `user`(`uid`)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE,
+	FOREIGN KEY `fk_contest`(`cid`)
+	REFERENCES `contest`(`id`)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+)ENGINE=InnoDB;
+
 

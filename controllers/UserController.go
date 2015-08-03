@@ -72,7 +72,7 @@ func (this *UserController) Signup() {
 	}
 	// All the fields verified, as well checked if username and email are unique
 	err := user.SignupVerify()
-	if err!= nil{
+	if err != nil {
 		flash := beego.NewFlash()
 		flash.Error(err.Error())
 		flash.Store(&this.Controller)
@@ -92,7 +92,7 @@ func (this *UserController) Show() {
 	if this.Ctx.Input.Param("0") == "" {
 		this.Abort("404")
 	}
-	user := models.User{ Username: this.Ctx.Input.Param("0") }
+	user := models.User{Username: this.Ctx.Input.Param("0")}
 	if user.GetByUsername() {
 		this.Data["title"] = user.Username
 		this.Data["userDetails"] = user
@@ -104,7 +104,7 @@ func (this *UserController) Show() {
 			this.Data["solvedProblemsExist"] = false
 		} else {
 			this.Data["solvedProblemsExist"] = true
-			for index,element := range logs {
+			for index, element := range logs {
 				p := models.Problem{Pid: element.Pid}
 				p.GetByPid()
 				problems[index] = p

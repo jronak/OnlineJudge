@@ -10,12 +10,6 @@ type AdminController struct {
 	BaseController
 }
 
-func (this *AdminController) Prepare() {
-	if !this.isAdmin() {
-		return
-	}
-}
-
 func (this *AdminController) isAdmin() bool {
 	if !this.isLoggedIn() {
 		this.Redirect("/user/login", 302)
@@ -37,6 +31,9 @@ func (this *AdminController) isLoggedIn() bool {
 }
 
 func (this *AdminController) ShowEditors() {
+	if !this.isAdmin() {
+		return
+	}
 	user := models.User{}
 	users := user.GetEditors()
 	bytes, _ := json.Marshal(users)
@@ -46,6 +43,9 @@ func (this *AdminController) ShowEditors() {
 
 // /admin/makeEditor/:uid
 func (this *AdminController) MakeEditor() {
+	if !this.isAdmin() {
+		return
+	}
 	uid := this.Ctx.Input.Param("uid")
 	user := models.User{}
 	id, _ := strconv.Atoi(uid)
@@ -56,6 +56,9 @@ func (this *AdminController) MakeEditor() {
 
 // /admin/revokeEditor/:uid
 func (this *AdminController) RevokeEditor() {
+	if !this.isAdmin() {
+		return
+	}
 	uid := this.Ctx.Input.Param("uid")
 	user := models.User{}
 	id, _ := strconv.Atoi(uid)
@@ -66,12 +69,28 @@ func (this *AdminController) RevokeEditor() {
 
 // /admin/search/name/:name
 func (this *AdminController) SearchName() {
-	uid := this.Ctx.Input.Param(":name")
+	if !this.isAdmin() {
+		return
+	}
+	name := this.Ctx.Input.Param(":name")
 	user := models.User{}
-	id, _ := strconv.Atoi(uid)
-	user.Uid = id
+	user.Name = name
 	users, _ := user.SearchByName()
 	bytes, _ := json.Marshal(users)
 	this.Data["json"] = string(bytes)
 	this.ServeJson()
+}
+
+// /admin/search/name/:uid
+func (this *AdminController) DeleteUser() {
+	if !this.isAdmin() {
+		return
+	}
+
+	uid := this.Ctx.Input.Param("uid")
+	user := models.User{}
+	id, _ := strconv.Atoi(uid)
+	user.Uid = id
+	status := user.Delete()
+	this.Data["status"] = status
 }
