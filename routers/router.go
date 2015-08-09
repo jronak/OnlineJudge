@@ -19,5 +19,6 @@ func init() {
 	beego.Router("/problem/:type/:page", &controllers.ProblemController{}, "*:ProblemByCategory")
 	beego.Router("/problem/:id/submit", &controllers.ProblemController{}, "post:SaveSubmission") // ->ProblemController(notes that user has tried solving problem)->ExecController(seek for helper to exec)->ProblemController(get result info & build on it)
 	beego.Router("/problem/:id/run", &controllers.ProblemController{}, "post:RunCode")
+	beego.Router("/test", &controllers.ProblemController{}, "post:Test")
 	// beego.Router("/problem/:id/edit", &controllers.ProblemController{}, "post:SaveProblem;*:Edit")
 }

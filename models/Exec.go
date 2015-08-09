@@ -2,7 +2,6 @@ package models
 
 import (
 	"OnlineJudge/Bridge"
-	"fmt"
 )
 
 // Just run code used here. if stdin is nil, then sample input is used
@@ -17,7 +16,6 @@ func Exec(pid int, rawCode string, lang string, stdin string) Bridge.Code {
 		}
 		code.Stdin = problem.Sample_input
 		Bridge.CompileExec(&cr)
-		fmt.Println(cr, *cr.Program, *cr.RawCode)
 		if code.Stdout != problem.Sample_output {
 			code.RunStatus = false
 		}
@@ -48,7 +46,10 @@ func ExecBatch(pid int, rawcode string, lang string) []Bridge.TestCaseStatus {
 	for i, test := range testcases {
 		testInput[i] = test.Input
 		testOutput[i] = test.Output
+
 	}
+	cr.TestInput = testInput
+	cr.TestOutput = testOutput
 	Bridge.CompileExec(&cr)
 	return cr.TestCaseOutput
 }

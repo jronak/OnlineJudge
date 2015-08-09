@@ -18,7 +18,7 @@ const (
 	solutionName      = "solution.json"
 	regularContainers = 1
 	contestContainers = 0
-	dirsCount         = 1
+	dirsCount         = 10
 )
 
 var (

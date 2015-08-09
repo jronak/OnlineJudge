@@ -73,16 +73,20 @@ func (this *ContestController) saveProblem() {
 	user.Uid = id.(int)
 	points, _ := strconv.Atoi(this.GetString("points"))
 	//remove replace foe newlines
+	sampleInput := strings.Replace(this.GetString("sample_input"), "\r", "", -1)
+	sampleOutput := strings.Replace(this.GetString("sample_output"), "\r", "", -1)
 	problem := models.Problem{
-		Statement:     this.GetString("statement"),
-		Description:   this.GetString("description"),
-		Constraints:   this.GetString("constraints"),
-		Sample_input:  this.GetString("sample_input"),
-		Sample_output: this.GetString("sample_output"),
-		Difficulty:    this.GetString("difficulty"),
-		Points:        points,
-		Uid:           id.(int),
+		Statement:   this.GetString("statement"),
+		Description: this.GetString("description"),
+		Constraints: this.GetString("constraints"),
+		//Sample_input:  this.GetString("sample_input"),
+		//Sample_output: this.GetString("sample_output"),
+		Difficulty: this.GetString("difficulty"),
+		Points:     points,
+		Uid:        id.(int),
 	}
+	problem.Sample_output = sampleOutput
+	problem.Sample_input = sampleInput
 	problem.Type = "contest" + contestName
 	pid, status := problem.Create()
 	if status {

@@ -6,9 +6,6 @@ import (
 )
 
 const (
-	defaultPath         = "/tmp/OnlineJ/Default/"
-	javaPaths           = "/tmp/OnlineJ/JavaP/"
-	rootPath            = "/tmp/OnlineJ"
 	fileDirPermissions  = 0755
 	javaPathsBufferSize = 1
 	nameBufferSize      = 10
@@ -109,7 +106,6 @@ func (cr *CRManager) CRBatch() {
 	cr.stdout = make(chan string, 1)
 	crChannelBatch <- cr
 	testStatus := make([]TestCaseStatus, len(cr.TestInput))
-	cr.CRBatch()
 	compileStatus := <-cr.receive
 	if compileStatus == 1 {
 		j := TestCaseStatus{}

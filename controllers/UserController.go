@@ -31,6 +31,7 @@ func (this *UserController) Login() {
 			this.SetSession("Uid", this.GetString("username"))
 			user.GetUserInfo()
 			this.SetSession("id", user.Uid)
+
 			// store the user ID in the session
 			this.Redirect("/", 302)
 		}

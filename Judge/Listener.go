@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	directories     = 1
+	directories     = 10
 	prefix          = "d"
 	requestName     = "problem.json"
 	solutionName    = "solution.json"

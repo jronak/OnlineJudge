@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/orm"
 	"strconv"
+	"strings"
 )
 
 type ProblemTypes struct {
@@ -85,17 +86,21 @@ func (this *ProblemController) SaveProblem() {
 
 	points, _ := strconv.Atoi(this.GetString("points"))
 	//remove replace foe newlines
+	sampleInput := strings.Replace(this.GetString("sample_input"), "\r", "", -1)
+	sampleOutput := strings.Replace(this.GetString("sample_output"), "\r", "", -1)
 	problem := models.Problem{
-		Statement:     this.GetString("statement"),
-		Description:   this.GetString("description"),
-		Constraints:   this.GetString("constraints"),
-		Sample_input:  this.GetString("sample_input"),
-		Sample_output: this.GetString("sample_output"),
-		Type:          this.GetString("type"),
-		Difficulty:    this.GetString("difficulty"),
-		Points:        points,
-		Uid:           id.(int),
+		Statement:   this.GetString("statement"),
+		Description: this.GetString("description"),
+		Constraints: this.GetString("constraints"),
+		//Sample_input:  this.GetString("sample_input"),
+		//Sample_output: this.GetString("sample_output"),
+		Type:       this.GetString("type"),
+		Difficulty: this.GetString("difficulty"),
+		Points:     points,
+		Uid:        id.(int),
 	}
+	problem.Sample_output = sampleOutput
+	problem.Sample_input = sampleInput
 	id, noerr := problem.Create()
 	pid := strconv.Itoa(id.(int))
 	if noerr == true {
@@ -164,13 +169,16 @@ func (this *ProblemController) SaveTestCase() {
 
 	timeout, _ := strconv.Atoi(this.GetString("timeout"))
 	//remove string replace
+	input := strings.Replace(this.GetString("input"), "\r", "", -1)
+	output := strings.Replace(this.GetString("output"), "\r", "", -1)
 	testcase := models.Testcases{
-		Pid:     id,
-		Input:   this.GetString("input"),
-		Output:  this.GetString("output"),
+		Pid: id,
+		//Input:   this.GetString("input"),
+		//Output:  this.GetString("output"),
 		Timeout: timeout,
 	}
-
+	testcase.Input = input
+	testcase.Output = output
 	done := testcase.Create()
 	if done == true {
 		this.Redirect("/problem/"+pid, 302)
@@ -205,7 +213,10 @@ func (this *ProblemController) ProblemById() {
 	}
 	p := models.Problem{Pid: id}
 	p.GetById()
-
+	if strings.Contains(p.Type, "contest") {
+		this.Redirect("/", 302)
+		return
+	}
 	log := models.Problemlogs{Pid: id}
 	logs, count := log.GetRecentByPid()
 	users := make(map[int]models.User)
@@ -274,6 +285,19 @@ func (this *ProblemController) RunCode() {
 
 	//uid := this.GetSession("id")
 	pid, _ := strconv.Atoi(this.Ctx.Input.Param(":id"))
+	problem := models.Problem{Pid: pid}
+	problem.GetByPid()
+	code := this.GetString("code")
+	lang := this.GetString("language")
+	stdin := this.GetString("stdin")
+	output := models.Exec(pid, code, lang, stdin)
+	js, _ := json.Marshal(output)
+	this.Data["json"] = string(js)
+	this.ServeJson()
+}
+
+func (this *ProblemController) Test() {
+	pid := 1
 	problem := models.Problem{Pid: pid}
 	problem.GetByPid()
 	code := this.GetString("code")
