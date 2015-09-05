@@ -8,7 +8,9 @@ protecting host against malicious code. Languages supported currently are
 * Java
 * Golang (1.4)
 
-
+## Requirements
+* GoLang (1.4 or higher)
+* mysql
 
 ## Dependancy
 * Beego Framework
