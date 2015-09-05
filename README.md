@@ -12,6 +12,17 @@ protecting host against malicious code. Languages supported currently are
 * GoLang (1.4 or higher)
 * mysql
 
+## Installation
+```
+go get github.com/JRonak/OnlineJudge
+```
+Run the firstsetup.bash to setup Linux containers
+In the project directory 
+```
+bee run
+```
+Make sure $GOPATH and git are added to env. Also setup dependencies
+
 ## Dependancy
 * Beego Framework
 ```
