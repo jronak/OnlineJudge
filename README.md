@@ -8,5 +8,18 @@ protecting host against malicious code. Languages supported currently are
 * Java
 * Golang (1.4)
 
-## This is an H2
-###### This is an H6
+
+
+## Dependancy
+* Beego Framework
+```
+go get github.com/astaxie/beego
+```
+* Bcrypt
+```
+golang.org/x/crypto/bcrypt
+```
+* Go-Sql-Driver
+```
+go get github.com/go-sql-driver/mysql
+```
