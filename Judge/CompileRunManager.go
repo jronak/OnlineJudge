@@ -124,6 +124,11 @@ func (cr *CRManager) CRBatch() {
 }
 
 func (cr *CRManager) CR() {
+	if codeExtensionsMap[cr.Program.Lang] == "" {
+		log.Println("Unknown Language ", cr.Program.Lang)
+		cr.Program.Stdout = "Error Language not found"
+		return
+	}
 	if cr.Isbatch == true {
 		cr.CRBatch()
 	} else {

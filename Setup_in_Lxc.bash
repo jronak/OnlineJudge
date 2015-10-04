@@ -49,15 +49,15 @@ cp -R Judge firstSetup.bash *.bash go/src
 rm *
 rm -r Judge
 cd go/src/Judge
-cp lxc* ../
-rm lxc**
+cp main ../
+rm main
 go build
 cd ..
-go build lxcmain.go
-cp lxcmain /home/ubuntu
+go build main.go
+cp main /home/ubuntu
 cp startJudge.bash /home/ubuntu
 cd /home/ubuntu
-chmod o+rw lxcmain startJudge.bash
+chmod o+rw main startJudge.bash
 echo "Go to localhost:5000 Setup the constraints for the container
 Then run the startJudge.bash as user
 "

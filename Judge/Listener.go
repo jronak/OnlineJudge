@@ -2,45 +2,54 @@ package Judge
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
-	"os"
+	"net/http"
+	//	"os"
 	"strconv"
-	"time"
 )
 
 const (
-	directories     = 10
+	directories     = 5
 	prefix          = "d"
 	requestName     = "problem.json"
 	solutionName    = "solution.json"
 	ProgramFileName = "code"
 )
 
-func DirectoryListener(dir string) {
-	i := true
-	_, _ = os.Create(dir + "file")
-	for i == true {
-		if file, _ := os.OpenFile(dir+requestName, os.O_RDWR, 0777); file != nil {
-			file.Close()
-			bytes, _ := ioutil.ReadFile(dir + requestName)
-			cr := CRManager{}
-			json.Unmarshal(bytes, &cr)
-			cr.Program.name = ProgramFileName
-			cr.Program.path = dir
-			cr.CR()
-			solutionBytes, _ := json.Marshal(&cr)
-			ioutil.WriteFile(dir+solutionName, solutionBytes, 0755)
-			os.Remove(dir + requestName)
+var (
+	dirString chan string
+)
+
+func worker(dir string, js string) string {
+	defer func() {
+		if x := recover(); x != nil {
+			log.Println("Recovered from shit")
 		}
-		time.Sleep(time.Second)
-	}
+	}()
+	cr := CRManager{}
+	json.Unmarshal([]byte(js), &cr)
+	cr.Program.name = ProgramFileName
+	cr.Program.path = dir
+	cr.CR()
+	solutionBytes, _ := json.Marshal(&cr)
+	dirString <- dir
+	return string(solutionBytes)
 }
 
-func init() {
+func serve(writer http.ResponseWriter, response *http.Request) {
+	response.ParseForm()
+	prob := response.Form.Get("json")
+	solu := worker(<-dirString, prob)
+	writer.Header().Add("json", solu)
+}
+
+func Start() {
+	dirString = make(chan string, 10)
 	log.Println("Judge: Successful")
 	for i := 1; i <= directories; i++ {
 		dir := prefix + strconv.Itoa(i) + "/"
-		go DirectoryListener(dir)
+		dirString <- dir
 	}
+	http.HandleFunc("/", serve)
+	http.ListenAndServe(":8080", nil)
 }
