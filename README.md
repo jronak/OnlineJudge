@@ -1,12 +1,14 @@
 # OnlineJudge (Deprecated)
-Judge built on Golang for hosting competetive programming contests and problems. Real time compilation and execution
+Judge built using Golang for hosting competetive programming contests and problems. Real time compilation and execution
 of programs against testcases. Safe compilation and execution of the user program carried out in Linux containers
-protecting host against malicious code. Languages supported currently are
+protecting host against malicious code. Languages supported are
 * C++
 * C
 * Python (3.4 & 2.7)
 * Java
 * Golang (1.4)
+* 
+(Check serverLxc branch) 
 
 ## Requirements
 * GoLang (1.4 or higher)
@@ -14,7 +16,7 @@ protecting host against malicious code. Languages supported currently are
 
 ## Installation
 ```
-go get github.com/JRonak/OnlineJudge
+go get -u github.com/JRonak/OnlineJudge
 ```
 Run the firstsetup.bash to setup Linux containers
 In the project directory 
