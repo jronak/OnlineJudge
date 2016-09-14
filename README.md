@@ -7,7 +7,6 @@ protecting host against malicious code. Languages supported are
 * Python (3.4 & 2.7)
 * Java
 * Golang (1.4)
-* 
 (Check serverLxc branch) 
 
 ## Requirements
