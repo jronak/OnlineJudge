@@ -1,4 +1,4 @@
-# OnlineJudge
+# OnlineJudge (Deprecated)
 Judge built on Golang for hosting competetive programming contests and problems. Real time compilation and execution
 of programs against testcases. Safe compilation and execution of the user program carried out in Linux containers
 protecting host against malicious code. Languages supported currently are
